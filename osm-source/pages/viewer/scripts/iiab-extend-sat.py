@@ -70,18 +70,18 @@ class Tools(object):
     def latlon2xy(self,lat,lon,z):
          n = self.numTiles(z)
          x,y = self.latlon2relativeXY(lat,lon)
-             return(n*x, n*y)
+         return(n*x, n*y)
 
     def tileXY(self,lat, lon, z):
          x,y = self.latlon2xy(lat,lon,z)
-             return(int(x),int(y))
+         return(int(x),int(y))
 
     def xy2latlon(self,x,y,z):
          n = self.numTiles(z)
          relY = y / n
          lat = self.mercatorToLat(pi * (1 - 2 * relY))
          lon = -180.0 + 360.0 * x / n
-             return(lat,lon)
+         return(lat,lon)
 
     def latEdges(self,y,z):
          n = numTiles(z)
@@ -90,19 +90,19 @@ class Tools(object):
          relY2 = relY1 + unit
          lat1 = self.mercatorToLat(pi * (1 - 2 * relY1))
          lat2 = self.mercatorToLat(pi * (1 - 2 * relY2))
-             return(lat1,lat2)
+         return(lat1,lat2)
 
     def lonEdges(self,x,z):
          n = numTiles(z)
          unit = 360 / n
          lon1 = -180 + x * unit
          lon2 = lon1 + unit
-             return(lon1,lon2)
+         return(lon1,lon2)
 
     def tileEdges(self,x,y,z):
          lat1,lat2 = latEdges(y,z)
          lon1,lon2 = lonEdges(x,z)
-             return((lat2, lon1, lat1, lon2)) # S,W,N,E
+         return((lat2, lon1, lat1, lon2)) # S,W,N,E
 
     def mercatorToLat(self,mercatorY):
          return(degrees(atan(sinh(mercatorY))))
@@ -245,7 +245,7 @@ class MBTiles():
                 raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
             self.conn.commit()
             return
-         else: # this is not an update
+        else: # this is not an update
              tile_id = uuid.uuid4().hex
              self.c.execute("INSERT INTO images ( tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
              if self.c.rowcount != 1:
@@ -253,7 +253,7 @@ class MBTiles():
              operation = 'insert into map'
              self.c.execute("INSERT INTO map (zoom_level, tile_column, tile_row, tile_id) VALUES (?, ?, ?, ?);",
                 (zoomLevel, tileColumn, tileRow, tile_id))
-         if self.c.rowcount != 1:
+        if self.c.rowcount != 1:
              raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
              self.conn.commit()
 
@@ -330,7 +330,7 @@ class MBTiles():
         print('Zoom Levels Found:%s'%len(rows))
         for row in rows:
             if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
-            print('%s %s %s %s %s %s %s'%(row[0],row[1],row[2],row[3],row[4],\
+                print('%s %s %s %s %s %s %s'%(row[0],row[1],row[2],row[3],row[4],\
                 row[5], (row[2]-row[1]+1) * ( row[4]-row[3]+1)))
             self.SetSatMetaData(row[0],'minX',row[1])
             self.SetSatMetaData(row[0],'maxX',row[2])
