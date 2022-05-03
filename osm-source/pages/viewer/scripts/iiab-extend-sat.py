@@ -218,7 +218,7 @@ class MBTiles():
 
     def DeleteSatData(self, zoomLevel, name):
         if not self.schemaReady:
-         self.CheckSchema()
+        self.CheckSchema()
 
         self.c.execute("DELETE FROM satdata WHERE name = ? AND zoom_level = ?", (zoomLevel, name,))
         self.conn.commit()
@@ -238,7 +238,7 @@ class MBTiles():
             self.c.execute("INSERT INTO images (tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
             if self.c.rowcount != 1:
                 raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
-            self.c.execute("""UPDATE map SET tile_id=? where zoom_level = ? AND 
+            self.c.execute("""UPDATE map SET tile_id=? where zoom_level = ? AND
                 tile_column = ? AND tile_row = ?;""",
                 (tile_id, zoomLevel, tileColumn, tileRow))
             if self.c.rowcount != 1:
@@ -246,16 +246,16 @@ class MBTiles():
             self.conn.commit()
             return
         else: # this is not an update
-             tile_id = uuid.uuid4().hex
-             self.c.execute("INSERT INTO images ( tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
-             if self.c.rowcount != 1:
-                 raise RuntimeError("Insert image failure")
-             operation = 'insert into map'
-             self.c.execute("INSERT INTO map (zoom_level, tile_column, tile_row, tile_id) VALUES (?, ?, ?, ?);",
+            tile_id = uuid.uuid4().hex
+            self.c.execute("INSERT INTO images ( tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
+            if self.c.rowcount != 1:
+                raise RuntimeError("Insert image failure")
+            operation = 'insert into map'
+            self.c.execute("INSERT INTO map (zoom_level, tile_column, tile_row, tile_id) VALUES (?, ?, ?, ?);",
                 (zoomLevel, tileColumn, tileRow, tile_id))
         if self.c.rowcount != 1:
-             raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
-             self.conn.commit()
+            raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
+            self.conn.commit()
 
 
     def DeleteTile(self, zoomLevel, tileColumn, tileRow):
@@ -266,8 +266,8 @@ class MBTiles():
         if not tile_id:
             raise RuntimeError("Tile not found")
 
-        self.c.execute("DELETE FROM images WHERE tile_id = ?;",tile_id) 
-        self.c.execute("DELETE FROM map WHERE tile_id = ?;",tile_id) 
+        self.c.execute("DELETE FROM images WHERE tile_id = ?;",tile_id)
+        self.c.execute("DELETE FROM map WHERE tile_id = ?;",tile_id)
         self.conn.commit()
 
     def TileExists(self, zoomLevel, tileColumn, tileRow):
@@ -311,7 +311,7 @@ class MBTiles():
         resp = self.c.execute(sql)
         rows = resp.fetchall()
         for row in rows:
-             self.bounds[row['zoom_level']] = { 'minX': row['min(tile_column)'],\
+            self.bounds[row['zoom_level']] = { 'minX': row['min(tile_column)'],\
                                   'maxX': row['max(tile_column)'],\
                                   'minY': row['min(tile_row)'],\
                                   'maxY': row['max(tile_row)'],\
