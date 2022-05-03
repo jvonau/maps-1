@@ -46,358 +46,356 @@ osm_dir = '/library/www/osm-vector-maps/maplist/assets'
 sat_dir = '/library/www/osm-vector-maps/viewer/tiles'
 
 # Translates between lat/long and the slippy-map tile numbering scheme
-# 
+#
 # http://wiki.openstreetmap.org/index.php/Slippy_map_tilenames
 # https://svn.openstreetmap.org/applications/routing/pyroute/tilenames.py
-# 
+#
 # Written by Oliver White, 2007
 # This file is public-domain
 #-------------------------------------------------------
 from math import *
 
 class Tools(object):
-   def numTiles(self,z):
-     return(pow(2,z))
+    def numTiles(self,z):
+         return(pow(2,z))
 
-   def sec(self,x):
-     return(1/cos(x))
+    def sec(self,x):
+         return(1/cos(x))
 
-   def latlon2relativeXY(self,lat,lon):
-     x = (lon + 180) / 360
-     y = (1 - log(tan(radians(lat)) + self.sec(radians(lat))) / pi) / 2
-     return(x,y)
+    def latlon2relativeXY(self,lat,lon):
+         x = (lon + 180) / 360
+         y = (1 - log(tan(radians(lat)) + self.sec(radians(lat))) / pi) / 2
+         return(x,y)
 
-   def latlon2xy(self,lat,lon,z):
-     n = self.numTiles(z)
-     x,y = self.latlon2relativeXY(lat,lon)
-     return(n*x, n*y)
-     
-   def tileXY(self,lat, lon, z):
-     x,y = self.latlon2xy(lat,lon,z)
-     return(int(x),int(y))
+    def latlon2xy(self,lat,lon,z):
+         n = self.numTiles(z)
+         x,y = self.latlon2relativeXY(lat,lon)
+             return(n*x, n*y)
 
-   def xy2latlon(self,x,y,z):
-     n = self.numTiles(z)
-     relY = y / n
-     lat = self.mercatorToLat(pi * (1 - 2 * relY))
-     lon = -180.0 + 360.0 * x / n
-     return(lat,lon)
-     
-   def latEdges(self,y,z):
-     n = numTiles(z)
-     unit = 1 / n
-     relY1 = y * unit
-     relY2 = relY1 + unit
-     lat1 = self.mercatorToLat(pi * (1 - 2 * relY1))
-     lat2 = self.mercatorToLat(pi * (1 - 2 * relY2))
-     return(lat1,lat2)
+    def tileXY(self,lat, lon, z):
+         x,y = self.latlon2xy(lat,lon,z)
+             return(int(x),int(y))
 
-   def lonEdges(self,x,z):
-     n = numTiles(z)
-     unit = 360 / n
-     lon1 = -180 + x * unit
-     lon2 = lon1 + unit
-     return(lon1,lon2)
-     
-   def tileEdges(self,x,y,z):
-     lat1,lat2 = latEdges(y,z)
-     lon1,lon2 = lonEdges(x,z)
-     return((lat2, lon1, lat1, lon2)) # S,W,N,E
+    def xy2latlon(self,x,y,z):
+         n = self.numTiles(z)
+         relY = y / n
+         lat = self.mercatorToLat(pi * (1 - 2 * relY))
+         lon = -180.0 + 360.0 * x / n
+             return(lat,lon)
 
-   def mercatorToLat(self,mercatorY):
-     return(degrees(atan(sinh(mercatorY))))
+    def latEdges(self,y,z):
+         n = numTiles(z)
+         unit = 1 / n
+         relY1 = y * unit
+         relY2 = relY1 + unit
+         lat1 = self.mercatorToLat(pi * (1 - 2 * relY1))
+         lat2 = self.mercatorToLat(pi * (1 - 2 * relY2))
+             return(lat1,lat2)
 
-   def tileSizePixels(self):
-     return(256)
+    def lonEdges(self,x,z):
+         n = numTiles(z)
+         unit = 360 / n
+         lon1 = -180 + x * unit
+         lon2 = lon1 + unit
+             return(lon1,lon2)
 
-   def tileLayerExt(self,layer):
-     if(layer in ('oam')):
-       return('jpg')
-     return('png')
+    def tileEdges(self,x,y,z):
+         lat1,lat2 = latEdges(y,z)
+         lon1,lon2 = lonEdges(x,z)
+             return((lat2, lon1, lat1, lon2)) # S,W,N,E
 
-   def tileLayerBase(self,layer):
-     layers = { \
-       "tah": "http://cassini.toolserver.org:8080/http://a.tile.openstreetmap.org/+http://toolserver.org/~cmarqu/hill/",
-      #"tah": "http://tah.openstreetmap.org/Tiles/tile/",
-       "oam": "http://oam1.hypercube.telascience.org/tiles/1.0.0/openaerialmap-900913/",
-       "mapnik": "http://tile.openstreetmap.org/mapnik/"
-       }
-     return(layers[layer])
-     
-   def tileURL(self,x,y,z,layer):
-     return "%s%d/%d/%d.%s" % (self.tileLayerBase(layer),z,x,y,self.tileLayerExt(layer))
+    def mercatorToLat(self,mercatorY):
+         return(degrees(atan(sinh(mercatorY))))
+
+    def tileSizePixels(self):
+         return(256)
+
+    def tileLayerExt(self,layer):
+         if(layer in ('oam')):
+             return('jpg')
+             return('png')
+
+    def tileLayerBase(self,layer):
+         layers = { \
+             "tah": "http://cassini.toolserver.org:8080/http://a.tile.openstreetmap.org/+http://toolserver.org/~cmarqu/hill/",
+             #"tah": "http://tah.openstreetmap.org/Tiles/tile/",
+             "oam": "http://oam1.hypercube.telascience.org/tiles/1.0.0/openaerialmap-900913/",
+             "mapnik": "http://tile.openstreetmap.org/mapnik/"
+           }
+         return(layers[layer])
+
+    def tileURL(self,x,y,z,layer):
+         return "%s%d/%d/%d.%s" % (self.tileLayerBase(layer),z,x,y,self.tileLayerExt(layer))
 
 class MBTiles():
-   def __init__(self, filename):
-      self.conn = sqlite3.connect(filename)
-      self.conn.row_factory = sqlite3.Row
-      self.conn.text_factory = str
-      self.conn.isolation_level = "EXCLUSIVE"
-      self.c = self.conn.cursor()
-      self.schemaReady = False
-      self.bounds = {}
+    def __init__(self, filename):
+        self.conn = sqlite3.connect(filename)
+        self.conn.row_factory = sqlite3.Row
+        self.conn.text_factory = str
+        self.conn.isolation_level = "EXCLUSIVE"
+        self.c = self.conn.cursor()
+        self.schemaReady = False
+        self.bounds = {}
 
-   def __del__(self):
-      self.conn.commit()
-      self.c.close()
-      del self.conn
+    def __del__(self):
+        self.conn.commit()
+        self.c.close()
+        del self.conn
 
-   def ListTiles(self):
-      rows = self.c.execute("SELECT zoom_level, tile_column, tile_row FROM tiles")
-      out = []
-      for row in rows:
-         out.append((row[0], row[1], row[2]))
-      return out
+    def ListTiles(self):
+        rows = self.c.execute("SELECT zoom_level, tile_column, tile_row FROM tiles")
+        out = []
+        for row in rows:
+            out.append((row[0], row[1], row[2]))
+        return out
 
-   def GetTile(self, zoomLevel, tileColumn, tileRow):
-      rows = self.c.execute("SELECT tile_data FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?", 
+    def GetTile(self, zoomLevel, tileColumn, tileRow):
+        rows = self.c.execute("SELECT tile_data FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?",
          (zoomLevel, tileColumn, tileRow))
-      rows = list(rows)
-      if len(rows) == 0:
-         raise RuntimeError("Tile not found")
-      row = rows[0]
-      return row[0]
+        rows = list(rows)
+        if len(rows) == 0:
+            raise RuntimeError("Tile not found")
+        row = rows[0]
+        return row[0]
 
-   def CheckSchema(self):     
-      sql = 'CREATE TABLE IF NOT EXISTS map (zoom_level INTEGER,tile_column INTEGER,tile_row INTEGER,tile_id TEXT,grid_id TEXT)'
-      self.c.execute(sql)
+    def CheckSchema(self):
+        sql = 'CREATE TABLE IF NOT EXISTS map (zoom_level INTEGER,tile_column INTEGER,tile_row INTEGER,tile_id TEXT,grid_id TEXT)'
+        self.c.execute(sql)
 
-      sql = 'CREATE TABLE IF NOT EXISTS images (tile_data blob,tile_id text)'
-      self.c.execute(sql)
+        sql = 'CREATE TABLE IF NOT EXISTS images (tile_data blob,tile_id text)'
+        self.c.execute(sql)
 
-      sql = 'CREATE TABLE IF NOT EXISTS satdata (zoom_level INTEGER,name text,value text)'
-      self.c.execute(sql)
+        sql = 'CREATE TABLE IF NOT EXISTS satdata (zoom_level INTEGER,name text,value text)'
+        self.c.execute(sql)
 
-      sql = 'CREATE VIEW IF NOT EXISTS tiles AS SELECT map.zoom_level AS zoom_level, map.tile_column AS tile_column, map.tile_row AS tile_row, images.tile_data AS tile_data FROM map JOIN images ON images.tile_id = map.tile_id'
-      self.c.execute(sql)
+        sql = 'CREATE VIEW IF NOT EXISTS tiles AS SELECT map.zoom_level AS zoom_level, map.tile_column AS tile_column, map.tile_row AS tile_row, images.tile_data AS tile_data FROM map JOIN images ON images.tile_id = map.tile_id'
+        self.c.execute(sql)
 
-      self.schemaReady = True
+        self.schemaReady = True
 
-   def GetAllMetaData(self):
-      rows = self.c.execute("SELECT name, value FROM metadata")
-      out = {}
-      for row in rows:
-         out[row[0]] = row[1]
-      return out
+    def GetAllMetaData(self):
+        rows = self.c.execute("SELECT name, value FROM metadata")
+        out = {}
+        for row in rows:
+            out[row[0]] = row[1]
+        return out
 
-   def SetMetaData(self, name, value):
-      if not self.schemaReady:
+    def SetMetaData(self, name, value):
+        if not self.schemaReady:
+            self.CheckSchema()
+
+        self.c.execute("UPDATE metadata SET value=? WHERE name=?", (value, name))
+        if self.c.rowcount == 0:
+            self.c.execute("INSERT INTO metadata (name, value) VALUES (?, ?);", (name, value))
+
+        self.conn.commit()
+
+    def DeleteMetaData(self, name):
+        if not self.schemaReady:
+            self.CheckSchema()
+
+        self.c.execute("DELETE FROM metadata WHERE name = ?", (name,))
+        self.conn.commit()
+        if self.c.rowcount == 0:
+            raise RuntimeError("Metadata name not found")
+
+    def SetSatMetaData(self, zoomLevel, name, value):
+        if not self.schemaReady:
+            self.CheckSchema()
+
+        self.c.execute("UPDATE satdata SET value=? WHERE zoom_level=? AND name = ?", (value, zoomLevel, name))
+        if self.c.rowcount == 0:
+            self.c.execute("INSERT INTO satdata (zoom_level, name, value) VALUES (?, ?, ?);", (zoomLevel, name, value))
+
+        self.conn.commit()
+
+    def GetSatMetaData(self,zoomLevel):
+        rows = self.c.execute("SELECT name, value FROM satdata WHERE zoom_level = ?",(str(zoomLevel),))
+        out = {}
+        for row in rows:
+            out[row[0]] = row[1]
+        return out
+
+    def DeleteSatData(self, zoomLevel, name):
+        if not self.schemaReady:
          self.CheckSchema()
 
-      self.c.execute("UPDATE metadata SET value=? WHERE name=?", (value, name))
-      if self.c.rowcount == 0:
-         self.c.execute("INSERT INTO metadata (name, value) VALUES (?, ?);", (name, value))
+        self.c.execute("DELETE FROM satdata WHERE name = ? AND zoom_level = ?", (zoomLevel, name,))
+        self.conn.commit()
+        if self.c.rowcount == 0:
+            raise RuntimeError("SatData name %s not found"%name)
 
-      self.conn.commit()
+    def SetTile(self, zoomLevel, tileColumn, tileRow, data):
+        if not self.schemaReady:
+            self.CheckSchema()
 
-   def DeleteMetaData(self, name):
-      if not self.schemaReady:
-         self.CheckSchema()
-
-      self.c.execute("DELETE FROM metadata WHERE name = ?", (name,))
-      self.conn.commit()
-      if self.c.rowcount == 0:
-         raise RuntimeError("Metadata name not found")
-
-   def SetSatMetaData(self, zoomLevel, name, value):
-      if not self.schemaReady:
-         self.CheckSchema()
-
-      self.c.execute("UPDATE satdata SET value=? WHERE zoom_level=? AND name = ?", (value, zoomLevel, name))
-      if self.c.rowcount == 0:
-         self.c.execute("INSERT INTO satdata (zoom_level, name, value) VALUES (?, ?, ?);", (zoomLevel, name, value))
-
-      self.conn.commit()
-
-   def GetSatMetaData(self,zoomLevel):
-      rows = self.c.execute("SELECT name, value FROM satdata WHERE zoom_level = ?",(str(zoomLevel),))
-      out = {}
-      for row in rows:
-         out[row[0]] = row[1]
-      return out
-
-   def DeleteSatData(self, zoomLevel, name):
-      if not self.schemaReady:
-         self.CheckSchema()
-
-      self.c.execute("DELETE FROM satdata WHERE name = ? AND zoom_level = ?", (zoomLevel, name,))
-      self.conn.commit()
-      if self.c.rowcount == 0:
-         raise RuntimeError("SatData name %s not found"%name)
-
-   def SetTile(self, zoomLevel, tileColumn, tileRow, data):
-      if not self.schemaReady:
-         self.CheckSchema()
-
-      tile_id = self.TileExists(zoomLevel, tileColumn, tileRow)
-      self.c.execute("begin transaction")
-      if tile_id: 
-         tile_id = uuid.uuid4().hex
-         operation = 'update images'
-         self.c.execute("DELETE FROM images  WHERE tile_id = ?;", ([tile_id]))
-         self.c.execute("INSERT INTO images (tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
+        tile_id = self.TileExists(zoomLevel, tileColumn, tileRow)
+        self.c.execute("begin transaction")
+        if tile_id:
+            tile_id = uuid.uuid4().hex
+            operation = 'update images'
+            self.c.execute("DELETE FROM images  WHERE tile_id = ?;", ([tile_id]))
+            self.c.execute("INSERT INTO images (tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
+            if self.c.rowcount != 1:
+                raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
+            self.c.execute("""UPDATE map SET tile_id=? where zoom_level = ? AND 
+                tile_column = ? AND tile_row = ?;""",
+                (tile_id, zoomLevel, tileColumn, tileRow))
+            if self.c.rowcount != 1:
+                raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
+            self.conn.commit()
+            return
+         else: # this is not an update
+             tile_id = uuid.uuid4().hex
+             self.c.execute("INSERT INTO images ( tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
+             if self.c.rowcount != 1:
+                 raise RuntimeError("Insert image failure")
+             operation = 'insert into map'
+             self.c.execute("INSERT INTO map (zoom_level, tile_column, tile_row, tile_id) VALUES (?, ?, ?, ?);",
+                (zoomLevel, tileColumn, tileRow, tile_id))
          if self.c.rowcount != 1:
-            raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
-         self.c.execute("""UPDATE map SET tile_id=? where zoom_level = ? AND 
-               tile_column = ? AND tile_row = ?;""", 
-            (tile_id, zoomLevel, tileColumn, tileRow))
-         if self.c.rowcount != 1:
-            raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
-         self.conn.commit()
-         return
-      else: # this is not an update
-         tile_id = uuid.uuid4().hex
-         self.c.execute("INSERT INTO images ( tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
-         if self.c.rowcount != 1:
-            raise RuntimeError("Insert image failure")
-         operation = 'insert into map'
-         self.c.execute("INSERT INTO map (zoom_level, tile_column, tile_row, tile_id) VALUES (?, ?, ?, ?);", 
-            (zoomLevel, tileColumn, tileRow, tile_id))
-      if self.c.rowcount != 1:
-         raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
-      self.conn.commit()
-   
+             raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
+             self.conn.commit()
 
-   def DeleteTile(self, zoomLevel, tileColumn, tileRow):
-      if not self.schemaReady:
-         self.CheckSchema()
 
-      tile_id = self.TileExists(zoomLevel, tileColumn, tileRow)
-      if not tile_id:
-         raise RuntimeError("Tile not found")
+    def DeleteTile(self, zoomLevel, tileColumn, tileRow):
+        if not self.schemaReady:
+            self.CheckSchema()
 
-      self.c.execute("DELETE FROM images WHERE tile_id = ?;",tile_id) 
-      self.c.execute("DELETE FROM map WHERE tile_id = ?;",tile_id) 
-      self.conn.commit()
+        tile_id = self.TileExists(zoomLevel, tileColumn, tileRow)
+        if not tile_id:
+            raise RuntimeError("Tile not found")
 
-   def TileExists(self, zoomLevel, tileColumn, tileRow):
-      if not self.schemaReady:
-         self.CheckSchema()
+        self.c.execute("DELETE FROM images WHERE tile_id = ?;",tile_id) 
+        self.c.execute("DELETE FROM map WHERE tile_id = ?;",tile_id) 
+        self.conn.commit()
 
-      sql = 'select tile_id from map where zoom_level = ? and tile_column = ? and tile_row = ?'
-      self.c.execute(sql,(zoomLevel, tileColumn, tileRow))
-      row = self.c.fetchall()
-      if len(row) == 0:
-         return None
-      return str(row[0][0])
+    def TileExists(self, zoomLevel, tileColumn, tileRow):
+        if not self.schemaReady:
+            self.CheckSchema()
 
-   def DownloadTile(self, zoomLevel, tileColumn, tileRow, lock):
-      # if the tile already exists, do nothing
-      lock.acquire()
-      tile_id = self.TileExists(zoomLevel, tileColumn, tileRow)
-      lock.release()
-      if tile_id:
-         #print('tile already exists -- skipping')
-         return 
-      try:
-         #wmts_row = int(2 ** zoomLevel - tileRow - 1)
-         r = src.get(zoomLevel,tileColumn,tileRow)
-      except Exception as e:
-         raise RuntimeError("Source data failure;%s"%e)
-         
-      if r.status == 200:
-         lock.acquire()
-         self.SetTile(zoomLevel, tileColumn, tileRow, r.data)
-         self.conn.commit()
-         lock.release()
-      else:
-         print('Sat data error, returned:%s'%r.status)
+        sql = 'select tile_id from map where zoom_level = ? and tile_column = ? and tile_row = ?'
+        self.c.execute(sql,(zoomLevel, tileColumn, tileRow))
+        row = self.c.fetchall()
+        if len(row) == 0:
+            return None
+        return str(row[0][0])
 
-   def Commit(self):
-      self.conn.commit()
+    def DownloadTile(self, zoomLevel, tileColumn, tileRow, lock):
+        # if the tile already exists, do nothing
+        lock.acquire()
+        tile_id = self.TileExists(zoomLevel, tileColumn, tileRow)
+        lock.release()
+        if tile_id:
+            #print('tile already exists -- skipping')
+            return
+        try:
+            #wmts_row = int(2 ** zoomLevel - tileRow - 1)
+            r = src.get(zoomLevel,tileColumn,tileRow)
+        except Exception as e:
+            raise RuntimeError("Source data failure;%s"%e)
 
-   def get_bounds(self):
-     sql = 'select zoom_level, min(tile_column),max(tile_column),min(tile_row),max(tile_row), count(zoom_level) from tiles group by zoom_level;'
-     resp = self.c.execute(sql)
-     rows = resp.fetchall()
-     for row in rows:
-         self.bounds[row['zoom_level']] = { 'minX': row['min(tile_column)'],\
+        if r.status == 200:
+            lock.acquire()
+            self.SetTile(zoomLevel, tileColumn, tileRow, r.data)
+            self.conn.commit()
+            lock.release()
+        else:
+            print('Sat data error, returned:%s'%r.status)
+
+    def Commit(self):
+        self.conn.commit()
+
+    def get_bounds(self):
+        sql = 'select zoom_level, min(tile_column),max(tile_column),min(tile_row),max(tile_row), count(zoom_level) from tiles group by zoom_level;'
+        resp = self.c.execute(sql)
+        rows = resp.fetchall()
+        for row in rows:
+             self.bounds[row['zoom_level']] = { 'minX': row['min(tile_column)'],\
                                   'maxX': row['max(tile_column)'],\
                                   'minY': row['min(tile_row)'],\
                                   'maxY': row['max(tile_row)'],\
                                   'count': row['count(zoom_level)'],\
                                  }
-     outstr = json.dumps(self.bounds,indent=2)
-     # diagnostic info
-     with open('/tmp/bounds.json','w') as bounds_fp:
-        bounds_fp.write(outstr)
-     return self.bounds
+        outstr = json.dumps(self.bounds,indent=2)
+        # diagnostic info
+        with open('/tmp/bounds.json','w') as bounds_fp:
+            bounds_fp.write(outstr)
+        return self.bounds
 
-   def summarize(self):
-     sql = 'select zoom_level, min(tile_column),max(tile_column),min(tile_row),max(tile_row), count(zoom_level) from tiles group by zoom_level;'
-     self.c.execute(sql)
-     rows = self.c.fetchall()
-     print('Zoom Levels Found:%s'%len(rows))
-     for row in rows:
-       if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
-         print('%s %s %s %s %s %s %s'%(row[0],row[1],row[2],row[3],row[4],\
-              row[5], (row[2]-row[1]+1) * ( row[4]-row[3]+1)))
-         self.SetSatMetaData(row[0],'minX',row[1])
-         self.SetSatMetaData(row[0],'maxX',row[2])
-         self.SetSatMetaData(row[0],'minY',row[3])
-         self.SetSatMetaData(row[0],'maxY',row[4])
-         self.SetSatMetaData(row[0],'count',row[5])
-         
-         
-  
-   def CountTiles(self,zoom):
-      self.c.execute("select tile_data from tiles where zoom_level = ?",(zoom,))
-      num = 0
-      while self.c.fetchone():
-         num += 1 
-      return num
+    def summarize(self):
+        sql = 'select zoom_level, min(tile_column),max(tile_column),min(tile_row),max(tile_row), count(zoom_level) from tiles group by zoom_level;'
+        self.c.execute(sql)
+        rows = self.c.fetchall()
+        print('Zoom Levels Found:%s'%len(rows))
+        for row in rows:
+            if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
+            print('%s %s %s %s %s %s %s'%(row[0],row[1],row[2],row[3],row[4],\
+                row[5], (row[2]-row[1]+1) * ( row[4]-row[3]+1)))
+            self.SetSatMetaData(row[0],'minX',row[1])
+            self.SetSatMetaData(row[0],'maxX',row[2])
+            self.SetSatMetaData(row[0],'minY',row[3])
+            self.SetSatMetaData(row[0],'maxY',row[4])
+            self.SetSatMetaData(row[0],'count',row[5])
 
-   def execute_script(self,script):
-      self.c.executescript(script)
+    def CountTiles(self,zoom):
+        self.c.execute("select tile_data from tiles where zoom_level = ?",(zoom,))
+        num = 0
+        while self.c.fetchone():
+            num += 1
+        return num
 
-   def copy_zoom(self,zoom,src):
-      sql = 'ATTACH DATABASE "%s" as src'%src
-      self.c.execute(sql)
-      sql = 'INSERT INTO map SELECT * from src.map where src.map.zoom_level=?'
-      self.c.execute(sql,[zoom])
-      sql = 'INSERT OR IGNORE INTO images SELECT src.images.tile_data, src.images.tile_id from src.images JOIN src.map ON src.map.tile_id = src.images.tile_id where map.zoom_level=?'
-      self.c.execute(sql,[zoom])
-      sql = 'DETACH DATABASE src'
-      self.c.execute(sql)
+    def execute_script(self,script):
+        self.c.executescript(script)
 
-   def copy_mbtile(self,src):
-      sql = 'ATTACH DATABASE "%s" as src'%src
-      self.c.execute(sql)
-      sql = 'INSERT INTO map SELECT * from src.map where true'
-      self.c.execute(sql,[zoom])
-      sql = 'INSERT OR IGNORE INTO images SELECT src.images.tile_data, src.images.tile_id from src.images JOIN src.map ON src.map.tile_id = src.images.tile_id where true'
-      self.c.execute(sql,[zoom])
-      sql = 'DETACH DATABASE src'
-      self.c.execute(sql)
+    def copy_zoom(self,zoom,src):
+        sql = 'ATTACH DATABASE "%s" as src'%src
+        self.c.execute(sql)
+        sql = 'INSERT INTO map SELECT * from src.map where src.map.zoom_level=?'
+        self.c.execute(sql,[zoom])
+        sql = 'INSERT OR IGNORE INTO images SELECT src.images.tile_data, src.images.tile_id from src.images JOIN src.map ON src.map.tile_id = src.images.tile_id where map.zoom_level=?'
+        self.c.execute(sql,[zoom])
+        sql = 'DETACH DATABASE src'
+        self.c.execute(sql)
 
-   def delete_zoom(self,zoom):
-      sql = 'DELETE FROM images where tile_id in (SELECT tile_id from map WHERE map.zoom_level=?)'
-      self.c.execute(sql,[zoom])
-      sql = 'DELETE FROM map where zoom_level=?'
-      self.c.execute(sql,[zoom])
-      sql = "vacuum"
-      self.c.execute(sql)
-      self.Commit()
+    def copy_mbtile(self,src):
+        sql = 'ATTACH DATABASE "%s" as src'%src
+        self.c.execute(sql)
+        sql = 'INSERT INTO map SELECT * from src.map where true'
+        self.c.execute(sql,[zoom])
+        sql = 'INSERT OR IGNORE INTO images SELECT src.images.tile_data, src.images.tile_id from src.images JOIN src.map ON src.map.tile_id = src.images.tile_id where true'
+        self.c.execute(sql,[zoom])
+        sql = 'DETACH DATABASE src'
+        self.c.execute(sql)
 
-   def create_sat_info(self):
-      sql = '''CREATE TABLE IF NOT EXISTS satellite_info (
+    def delete_zoom(self,zoom):
+        sql = 'DELETE FROM images where tile_id in (SELECT tile_id from map WHERE map.zoom_level=?)'
+        self.c.execute(sql,[zoom])
+        sql = 'DELETE FROM map where zoom_level=?'
+        self.c.execute(sql,[zoom])
+        sql = "vacuum"
+        self.c.execute(sql)
+        self.Commit()
+
+    def create_sat_info(self):
+        sql = '''CREATE TABLE IF NOT EXISTS satellite_info (
                perma_ref TEXT, bounds TEXT, coordinates TEXT,
                date_downloaded TEXT, tiles_downloaded INTEGER,
                command_line TEXT, magic_number INTEGER,
                min_zoom INTEGER, max_zoom INTEGER
-      )''' 
-      self.c.execute(sql)
-      self.Commit()
+        )'''
+        self.c.execute(sql)
+        self.Commit()
 
-   def insert_sat_info(self,perma_ref,bounds,coordinates,date_downloaded,
+    def insert_sat_info(self,perma_ref,bounds,coordinates,date_downloaded,
                        tiles_downloaded,command_line,magic_number,
                        min_zoom,max_zoom):
-      sql = '''insert into satellite_info (perma_ref,bounds,coordinates,
+        sql = '''insert into satellite_info (perma_ref,bounds,coordinates,
                date_downloaded,tiles_downloaded,command_line,
                magic_number,min_zoom,max_zoom) values (?,?,?,?,?,?,?,?,?)'''
-      self.c.execute(sql,(perma_ref,bounds,coordinates,date_downloaded,
+        self.c.execute(sql,(perma_ref,bounds,coordinates,date_downloaded,
                      tiles_downloaded,command_line,magic_number,min_zoom,max_zoom,))
-      self.Commit()
+        self.Commit()
 
 class WMTS(object):
 
