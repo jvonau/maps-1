@@ -218,7 +218,7 @@ class MBTiles():
 
     def DeleteSatData(self, zoomLevel, name):
         if not self.schemaReady:
-        self.CheckSchema()
+            self.CheckSchema()
 
         self.c.execute("DELETE FROM satdata WHERE name = ? AND zoom_level = ?", (zoomLevel, name,))
         self.conn.commit()
