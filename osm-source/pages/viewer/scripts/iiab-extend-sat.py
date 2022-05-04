@@ -116,7 +116,7 @@ class Tools(object):
             return('png')
 
     def tileLayerBase(self, layer):
-        layers = { \
+        layers = {
             "tah": "http://cassini.toolserver.org:8080/http://a.tile.openstreetmap.org/+http://toolserver.org/~cmarqu/hill/",
             # "tah": "http://tah.openstreetmap.org/Tiles/tile/",
             "oam": "http://oam1.hypercube.telascience.org/tiles/1.0.0/openaerialmap-900913/",
@@ -311,11 +311,11 @@ class MBTiles():
         resp = self.c.execute(sql)
         rows = resp.fetchall()
         for row in rows:
-            self.bounds[row['zoom_level']] = {'minX': row['min(tile_column)'],\
-                                  'maxX': row['max(tile_column)'],\
-                                  'minY': row['min(tile_row)'],\
-                                  'maxY': row['max(tile_row)'],\
-                                  'count': row['count(zoom_level)'],\
+            self.bounds[row['zoom_level']] = {'minX': row['min(tile_column)'],
+                                  'maxX': row['max(tile_column)'],
+                                  'minY': row['min(tile_row)'],
+                                  'maxY': row['max(tile_row)'],
+                                  'count': row['count(zoom_level)'],
                                  }
         outstr = json.dumps(self.bounds, indent=2)
         # diagnostic info
@@ -330,7 +330,7 @@ class MBTiles():
         print('Zoom Levels Found:%s'%len(rows))
         for row in rows:
             if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
-                print('%s %s %s %s %s %s %s'%(row[0], row[1], row[2], row[3], row[4],\
+                print('%s %s %s %s %s %s %s'%(row[0], row[1], row[2], row[3], row[4],
                 row[5], (row[2]-row[1]+1) * (row[4]-row[3]+1)))
             self.SetSatMetaData(row[0], 'minX', row[1])
             self.SetSatMetaData(row[0], 'maxX', row[2])
@@ -401,7 +401,7 @@ class WMTS(object):
 
     def __init__(self, template):
         self.template = template
-        self.http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',\
+        self.http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
             ca_certs=certifi.where())
 
     def get(self, z, x, y):
@@ -538,11 +538,11 @@ class Extract(object):
         global bbox_limits
         cur_box = regions[region]
         for zoom in range(bbox_zoom_start-1, 14):
-            xmin, xmax, ymin, ymax = bbox_tile_limits(cur_box['west'], cur_box['south'], \
+            xmin, xmax, ymin, ymax = bbox_tile_limits(cur_box['west'], cur_box['south'],
             cur_box['east'], cur_box['north'], zoom)
             # print(xmin,xmax,ymin,ymax,zoom)
             tot_tiles = mbTiles.CountTiles(zoom)
-            bbox_limits[zoom] = {'minX': xmin, 'maxX': xmax, 'minY': ymin, 'maxY': ymax, \
+            bbox_limits[zoom] = {'minX': xmin, 'maxX': xmax, 'minY': ymin, 'maxY': ymax,
                               'count': tot_tiles}
         with open('/tmp/bbox_limits', 'w') as fp:
             fp.write(json.dumps(bbox_limits, indent=2))
@@ -587,7 +587,7 @@ class Extract(object):
         bound_string = "%s,%s,%s,%s"%(west, south, east, north)
         poly = Polygon([[[west, south], [east, south], [east, north], [west, north], [west, south]]])
         if not magic_number_found:
-            data['features'].append(Feature(geometry=poly, properties={"name": 'satellite', \
+            data['features'].append(Feature(geometry=poly, properties={"name": 'satellite',
                            "magic_number": magic_number}))
 
         collection = FeatureCollection(data['features'])
