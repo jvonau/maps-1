@@ -21,7 +21,7 @@ import uuid
 import io
 import datetime
 from PIL import Image
-#import pdb; pdb.set_trace()
+# import pdb; pdb.set_trace()
 
 # GLOBALS
 mbTiles = object
@@ -52,7 +52,7 @@ sat_dir = '/library/www/osm-vector-maps/viewer/tiles'
 #
 # Written by Oliver White, 2007
 # This file is public-domain
-#-------------------------------------------------------
+# -------------------------------------------------------
 from math import *
 
 class Tools(object):
@@ -118,7 +118,7 @@ class Tools(object):
     def tileLayerBase(self, layer):
         layers = { \
             "tah": "http://cassini.toolserver.org:8080/http://a.tile.openstreetmap.org/+http://toolserver.org/~cmarqu/hill/",
-            #"tah": "http://tah.openstreetmap.org/Tiles/tile/",
+            # "tah": "http://tah.openstreetmap.org/Tiles/tile/",
             "oam": "http://oam1.hypercube.telascience.org/tiles/1.0.0/openaerialmap-900913/",
             "mapnik": "http://tile.openstreetmap.org/mapnik/"
         }
@@ -287,10 +287,10 @@ class MBTiles():
         tile_id = self.TileExists(zoomLevel, tileColumn, tileRow)
         lock.release()
         if tile_id:
-            #print('tile already exists -- skipping')
+            # print('tile already exists -- skipping')
             return
         try:
-            #wmts_row = int(2 ** zoomLevel - tileRow - 1)
+            # wmts_row = int(2 ** zoomLevel - tileRow - 1)
             r = src.get(zoomLevel, tileColumn, tileRow)
         except Exception as e:
             raise RuntimeError("Source data failure;%s"%e)
@@ -572,7 +572,7 @@ class Extract(object):
         bboxes = osm_dir + "/bboxes.geojson"
         with open(bboxes, "r") as bounding_geojson:
             data = geojson.load(bounding_geojson)
-        #feature_collection = FeatureCollection(data['features'])
+        # feature_collection = FeatureCollection(data['features'])
         magic_number_found = False
         for feature in data['features']:
             if feature['properties'].get('magic_number') == magic_number:
@@ -767,8 +767,8 @@ def do_downloads():
     except:
         print('failed to open source')
         sys.exit(1)
-     # the following sets up a copy of the real sat dbase --
-     # Commenting out will just append to sat db already in use
+    # the following sets up a copy of the real sat dbase --
+    # Commenting out will just append to sat db already in use
     if args.name != 'avni':
         set_up_target_db(args.name)
 
