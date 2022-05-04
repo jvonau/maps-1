@@ -332,11 +332,11 @@ class MBTiles():
             if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
                 print('%s %s %s %s %s %s %s'%(row[0], row[1], row[2], row[3], row[4],\
                 row[5], (row[2]-row[1]+1) * ( row[4]-row[3]+1)))
-            self.SetSatMetaData(row[0],'minX', row[1])
-            self.SetSatMetaData(row[0],'maxX', row[2])
-            self.SetSatMetaData(row[0],'minY', row[3])
-            self.SetSatMetaData(row[0],'maxY', row[4])
-            self.SetSatMetaData(row[0],'count', row[5])
+            self.SetSatMetaData(row[0], 'minX', row[1])
+            self.SetSatMetaData(row[0], 'maxX', row[2])
+            self.SetSatMetaData(row[0], 'minY', row[3])
+            self.SetSatMetaData(row[0], 'maxY', row[4])
+            self.SetSatMetaData(row[0], 'count', row[5])
 
     def CountTiles(self, zoom):
         self.c.execute("select tile_data from tiles where zoom_level = ?", (zoom,))
@@ -389,11 +389,11 @@ class MBTiles():
 
     def insert_sat_info(self, perma_ref, bounds, coordinates, date_downloaded,
                        tiles_downloaded, command_line, magic_number,
-                       min_zoom,max_zoom):
+                       min_zoom, max_zoom):
         sql = '''insert into satellite_info (perma_ref,bounds,coordinates,
                date_downloaded,tiles_downloaded,command_line,
                magic_number,min_zoom,max_zoom) values (?,?,?,?,?,?,?,?,?)'''
-        self.c.execute(sql,(perma_ref, bounds, coordinates, date_downloaded,
+        self.c.execute(sql, (perma_ref, bounds, coordinates, date_downloaded,
                      tiles_downloaded, command_line, magic_number, min_zoom, max_zoom,))
         self.Commit()
 
@@ -410,20 +410,20 @@ class WMTS(object):
         srcurl = srcurl.replace('{x}', str(x))
         srcurl = srcurl.replace('{y}', str(y))
         # print(srcurl[-50:])
-        resp = (self.http.request("GET", srcurl,retries=10))
+        resp = (self.http.request("GET", srcurl, retries=10))
         return(resp)
 
     def parse_args():
         parser = argparse.ArgumentParser(description="Download WMTS tiles arount a point.")
-        parser.add_argument('-z', "--zoom", help="zoom level minimum", type=int,default=10)
+        parser.add_argument('-z', "--zoom", help="zoom level minimum", type=int, default=10)
         parser.add_argument("-m", "--mbtiles", help="mbtiles filename.")
         parser.add_argument("-v", "--verify", help="verify mbtiles.", action='store_true')
         parser.add_argument("-f", "--fix", help="fix invalid tiles.", action='store_true')
         parser.add_argument("-n", "--name", help="Output filename.")
         parser.add_argument("--lat", help="Latitude degrees.", type=float)
         parser.add_argument("--lon", help="Longitude degrees.", type=float)
-        parser.add_argument("-r", "--radius", help="Download within this radius(km).", type=float,default=0.0)
-        parser.add_argument('-t', "--topzoom", help="top zoom level plus one,default=14", type=int,default=14)
+        parser.add_argument("-r", "--radius", help="Download within this radius(km).", type=float, default=0.0)
+        parser.add_argument('-t', "--topzoom", help="top zoom level plus one,default=14", type=int, default=14)
         parser.add_argument("-g", "--get", help='get WMTS tiles from this URL(Default: Sentinel Cloudless).')
         parser.add_argument("-s", "--summarize", help="Data about each zoom level.", action="store_true")
         return parser.parse_args()
@@ -526,7 +526,7 @@ class Extract(object):
         # print('tile dim(km):%s'%tile_kmeters)
         per_pixel = tile_kmeters / 256 * 1000
         # print('%s meters per pixel'%per_pixel)
-        tileX,tileY = coordinates2WmtsTilesNumbers(lat_deg, lon_deg, zoom)
+        tileX, tileY = coordinates2WmtsTilesNumbers(lat_deg, lon_deg, zoom)
         tile_radius = radius_km / tile_kmeters
         minX = int(tileX - tile_radius)
         maxX = int(tileX + tile_radius + 1)
@@ -537,25 +537,25 @@ class Extract(object):
     def record_bbox_debug_info():
         global bbox_limits
         cur_box = regions[region]
-        for zoom in range(bbox_zoom_start-1,14):
-            xmin,xmax,ymin,ymax = bbox_tile_limits(cur_box['west'],cur_box['south'],\
-            cur_box['east'],cur_box['north'],zoom)
+        for zoom in range(bbox_zoom_start-1, 14):
+            xmin, xmax, ymin, ymax = bbox_tile_limits(cur_box['west'], cur_box['south'], \
+            cur_box['east'], cur_box['north'], zoom)
             # print(xmin,xmax,ymin,ymax,zoom)
             tot_tiles = mbTiles.CountTiles(zoom)
-            bbox_limits[zoom] = { 'minX': xmin,'maxX':xmax,'minY':ymin,'maxY':ymax,\
-                              'count':tot_tiles}
-        with open('/tmp/bbox_limits','w') as fp:
-            fp.write(json.dumps(bbox_limits,indent=2))
+            bbox_limits[zoom] = { 'minX': xmin, 'maxX': xmax, 'minY': ymin, 'maxY': ymax, \
+                              'count': tot_tiles}
+        with open('/tmp/bbox_limits', 'w') as fp:
+            fp.write(json.dumps(bbox_limits, indent=2))
 
-    def get_degree_extent(lat_deg,lon_deg,radius_km,zoom=13):
-        (minX,maxX,minY,maxY) = get_bounds(lat_deg,lon_deg,radius_km,zoom)
+    def get_degree_extent(lat_deg, lon_deg, radius_km, zoom=13):
+        (minX, maxX, minY, maxY) = get_bounds(lat_deg, lon_deg, radius_km, zoom)
         # print('minX:%s,maxX:%s,minY:%s,maxY:%s'%(minX,maxX,minY,maxY))
         # following function returns (y,x)
-        north_west_point = xytools.xy2latlon(minX,minY,zoom)
-        south_east_point = xytools.xy2latlon(maxX+1,maxY+1,zoom)
+        north_west_point = xytools.xy2latlon(minX, minY, zoom)
+        south_east_point = xytools.xy2latlon(maxX+1, maxY+1, zoom)
         # print('north_west:%s south_east:%s'%(north_west_point, south_east_point))
         # returns (west, south, east, north)
-        return (north_west_point[1],south_east_point[0],south_east_point[1],north_west_point[0])
+        return (north_west_point[1], south_east_point[0], south_east_point[1], north_west_point[0])
 
 
     def coordinates2WmtsTilesNumbers(lat_deg, lon_deg, zoom):
@@ -565,12 +565,12 @@ class Extract(object):
         ytile = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
         return (xtile, ytile)
 
-    def sat_bboxes(lat_deg,lon_deg,zoom,radius):
-        global bound_string,poly,magic_number
+    def sat_bboxes(lat_deg, lon_deg, zoom, radius):
+        global bound_string, poly, magic_number
         # Adds a bounding box for the current location, radius
         magic_number = int(lat_deg * lon_deg * radius)
         bboxes = osm_dir + "/bboxes.geojson"
-        with open(bboxes,"r") as bounding_geojson:
+        with open(bboxes, "r") as bounding_geojson:
             data = geojson.load(bounding_geojson)
         #feature_collection = FeatureCollection(data['features'])
         magic_number_found = False
@@ -578,21 +578,21 @@ class Extract(object):
             if feature['properties'].get('magic_number') == magic_number:
                 magic_number_found = True
         features = []
-        (west, south, east, north) = get_degree_extent(lat_deg,lon_deg,radius,zoom)
+        (west, south, east, north) = get_degree_extent(lat_deg, lon_deg, radius, zoom)
         # print('west:%s, south:%s, east:%s, north:%s'%(west, south, east, north))
         west=float(west)
         south=float(south)
         east=float(east)
         north=float(north)
-        bound_string = "%s,%s,%s,%s"%(west,south,east,north)
-        poly = Polygon([[[west,south],[east,south],[east,north],[west,north],[west,south]]])
+        bound_string = "%s,%s,%s,%s"%(west, south, east, north)
+        poly = Polygon([[[west, south], [east, south], [east, north], [west, north], [west, south]]])
         if not magic_number_found:
-            data['features'].append(Feature(geometry=poly,properties={"name":'satellite',\
-                           "magic_number":magic_number}))
+            data['features'].append(Feature(geometry=poly, properties={"name": 'satellite', \
+                           "magic_number": magic_number}))
 
         collection = FeatureCollection(data['features'])
         bboxes = osm_dir + "/bboxes.geojson"
-        with open(bboxes,"w") as bounding_geojson:
+        with open(bboxes, "w") as bounding_geojson:
             outstr = geojson.dumps(collection, indent=2)
             bounding_geojson.write(outstr)
 
@@ -609,7 +609,7 @@ class Extract(object):
 
         # copy the source into a work directory, then do in place substitution
         set_up_target_db('fix_try')
-        bad_ref = open('/tmp/bad_tiles','w')
+        bad_ref = open('/tmp/bad_tiles', 'w')
 
 
     def scan_verify():
@@ -622,9 +622,9 @@ class Extract(object):
         for zoom in sorted(bounds.keys()):
             # if zoom == 5: sys.exit()
             bad = ok = empty = html = 0
-            for tileY in range(bounds[zoom]['minY'],bounds[zoom]['maxY'] + 1):
+            for tileY in range(bounds[zoom]['minY'], bounds[zoom]['maxY'] + 1):
             # print("New Y:%s on zoom:%s"%(tileY,zoom))
-                for tileX in range(bounds[zoom]['minX'],bounds[zoom]['maxX'] + 1):
+                for tileX in range(bounds[zoom]['minX'], bounds[zoom]['maxX'] + 1):
                     # print('tileX:%s'%tileX)
                     replace = False
                     raw = mbTiles.GetTile(zoom, tileX, tileY)
@@ -642,25 +642,25 @@ class Extract(object):
                         if line.find("DOCTYPE") != -1:
                             html +=1
                         if args.fix and replace:
-                            success = replace_tile(src,zoom,tileX,tileY)
+                            success = replace_tile(src, zoom, tileX, tileY)
                             if success:
-                                bad_ref.write('%s,%s,%s\n'%(zoom,tileX,tileY))
+                                bad_ref.write('%s,%s,%s\n'%(zoom, tileX, tileY))
                                 replaced += 1
                             else:
-                                bad_ref.write('%s,%s,%s\n'%(zoom,tileX,tileY))
+                                bad_ref.write('%s,%s,%s\n'%(zoom, tileX, tileY))
                                 unfixable += 1
                             if tileY % 20 == 0:
-                                print('replaced:%s  ok:%s'%(replaced,ok))
-                    print ('bad',bad,'ok',ok, 'empty',empty,'html',html, 'unfixable',unfixable,'zoom',zoom,'replaced',replaced)
-            print ('bad',bad,'ok',ok, 'empty',empty,'html',html, 'unfixable',unfixable)
+                                print('replaced:%s  ok:%s'%(replaced, ok))
+                    print ('bad', bad, 'ok', ok, 'empty', empty, 'html', html, 'unfixable', unfixable, 'zoom', zoom, 'replaced', replaced)
+            print ('bad', bad, 'ok', ok, 'empty', empty, 'html', html, 'unfixable', unfixable)
             if args.fix:
                 bad_ref.close()
 
-def replace_tile(src,zoom,tileX,tileY):
+def replace_tile(src, zoom, tileX, tileY):
     global total_tiles
-    for tries in range(1,10):
+    for tries in range(1, 10):
         try:
-            r = src.get(zoom,tileX,tileY)
+            r = src.get(zoom, tileX, tileY)
         except Exception as e:
             print(str(e))
             sys.exit(1)
@@ -690,7 +690,7 @@ def replace_tile(src,zoom,tileX,tileY):
             print('get url in replace_tile returned:%s'%r.status)
             return False
 
-def download_tiles(src,lat_deg,lon_deg,zoom,radius):
+def download_tiles(src, lat_deg, lon_deg, zoom, radius):
     global mbTiles, ok
     global total_tiles
     global start
@@ -700,12 +700,12 @@ def download_tiles(src,lat_deg,lon_deg,zoom,radius):
         tileY_min = 0
         tileY_max = 2 ** zoom
     else:
-        tileX_min,tileX_max,tileY_min,tileY_max = get_bounds(lat_deg,lon_deg,radius,zoom)
-    for tileX in range(tileX_min,tileX_max+1):
-        for tileY in range(tileY_min,tileY_max+1):
+        tileX_min, tileX_max, tileY_min, tileY_max = get_bounds(lat_deg, lon_deg, radius, zoom)
+    for tileX in range(tileX_min, tileX_max+1):
+        for tileY in range(tileY_min, tileY_max+1):
             if (total_tiles % 10) == 0:
-                print('tileX:%s tileY:%s zoom:%s already-downloaded:%s added:%s'%(tileX,tileY,zoom,ok,total_tiles), flush=True)
-                tile_exists =  mbTiles.TileExists(zoom,tileX,tileY)
+                print('tileX:%s tileY:%s zoom:%s already-downloaded:%s added:%s'%(tileX, tileY, zoom, ok, total_tiles), flush=True)
+                tile_exists =  mbTiles.TileExists(zoom, tileX, tileY)
             if tile_exists != None:
                 raw = mbTiles.GetTile(zoom, tileX, tileY)
             try:
@@ -715,7 +715,7 @@ def download_tiles(src,lat_deg,lon_deg,zoom,radius):
                     continue
             except Exception as e:
                 pass
-            replace_tile(src,zoom,tileX,tileY)
+            replace_tile(src, zoom, tileX, tileY)
 
 def set_up_target_db(name='sentinel'):
     global mbTiles
@@ -727,7 +727,7 @@ def set_up_target_db(name='sentinel'):
     if not os.path.isdir(work_dir):
         # os.mkdir('./work')
         work_dir = '/tmp'
-        dbpath = '%s/%s'%(work_dir,dbname)
+        dbpath = '%s/%s'%(work_dir, dbname)
         if not os.path.exists(dbpath):
         # if True:
         #    shutil.copyfile('%s/%s'%(sat_dir,sat_mbtile_fname),dbpath)
@@ -741,7 +741,7 @@ def set_up_target_db(name='sentinel'):
     print("Destination Database opened successfully:%s"%dbpath)
 
 def record_satellite_info():
-    sat_bboxes(args.lat,args.lon,args.zoom,args.radius)
+    sat_bboxes(args.lat, args.lon, args.zoom, args.radius)
     mbTiles.create_sat_info()
     perma_ref = 'satellite_z0'
     coordinates = str(poly)
@@ -753,9 +753,9 @@ def record_satellite_info():
     for nibble in sys.argv:
         command_line += nibble + ' '
     bounds_string = str(bounds)
-    mbTiles.insert_sat_info(perma_ref,bounds_string,coordinates,date_downloaded,
-                       tiles_downloaded,command_line,magic_number,
-                       min_zoom,max_zoom)
+    mbTiles.insert_sat_info(perma_ref, bounds_string, coordinates, date_downloaded,
+                       tiles_downloaded, command_line, magic_number,
+                       min_zoom, max_zoom)
 
 def do_downloads():
     # Open a WMTS source
@@ -773,13 +773,13 @@ def do_downloads():
         set_up_target_db(args.name)
 
     start = time.time()
-    print(args.zoom,args.topzoom)
-    for zoom in range(args.zoom,args.topzoom):
-        print("new zoom level:%s"%zoom,flush=True)
-        download_tiles(src,args.lat,args.lon,zoom,args.radius)
+    print(args.zoom, args.topzoom)
+    for zoom in range(args.zoom, args.topzoom):
+        print("new zoom level:%s"%zoom, flush=True)
+        download_tiles(src, args.lat, args.lon, zoom, args.radius)
     seconds =(time.time()-start)
-    d,h,m,s = dhms_from_seconds(seconds)
-    print('Total time:%2.0f hrs:%2.0f min:%2.0f sec Duplicates:%s Total_tiles Added:%s'%(h,m,s,ok,total_tiles))
+    d, h, m, s = dhms_from_seconds(seconds)
+    print('Total time:%2.0f hrs:%2.0f min:%2.0f sec Duplicates:%s Total_tiles Added:%s'%(h, m, s, ok, total_tiles))
     record_satellite_info()
 
 def main():
@@ -825,8 +825,8 @@ def main():
         args.lat = 37.46
     if args.topzoom != 14:
         args.topzoom = args.topzoom+1
-    print('inputs to tileXY: lat:%s lon:%s zoom:%s'%(args.lat,args.lon,args.zoom))
-    args.x,args.y = xytools.tileXY(args.lat,args.lon,args.zoom)
+    print('inputs to tileXY: lat:%s lon:%s zoom:%s'%(args.lat, args.lon, args.zoom))
+    args.x, args.y = xytools.tileXY(args.lat, args.lon, args.zoom)
 
     do_downloads()
 
