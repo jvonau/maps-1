@@ -27,8 +27,8 @@ from PIL import Image
 mbTiles = object
 args = object
 bounds = object
-earth_circum = 40075.0 # in km
-bbox_limits = {} # set by sat_bbox_limits, read by download
+earth_circum = 40075.0  # in km
+bbox_limits = {}  # set by sat_bbox_limits, read by download
 src = object
 config = {}
 config_fn = 'config.json'
@@ -102,7 +102,7 @@ class Tools(object):
     def tileEdges(self, x, y, z):
         lat1, lat2 = latEdges(y, z)
         lon1, lon2 = lonEdges(x, z)
-        return((lat2, lon1, lat1, lon2)) # S,W,N,E
+        return((lat2, lon1, lat1, lon2))  # S,W,N,E
 
     def mercatorToLat(self, mercatorY):
         return(degrees(atan(sinh(mercatorY))))
@@ -245,7 +245,7 @@ class MBTiles():
                 raise RuntimeError("Failure %s RowCount:%s"%(operation, self.c.rowcount))
             self.conn.commit()
             return
-        else: # this is not an update
+        else:  # this is not an update
             tile_id = uuid.uuid4().hex
             self.c.execute("INSERT INTO images ( tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data), tile_id))
             if self.c.rowcount != 1:
@@ -483,7 +483,7 @@ class Extract(object):
             args.x = 3
             args.y = 0
             args.zoom = 2
-        global src # the opened url for satellite images
+        global src  # the opened url for satellite images
         try:
             src = WMTS(url)
         except:
@@ -613,7 +613,7 @@ class Extract(object):
 
 
     def scan_verify():
-        global src # the opened url for satellite images
+        global src  # the opened url for satellite images
         if args.fix:
             create_clone()
         replaced = bad = ok = empty = html = unfixable = 0
@@ -759,7 +759,7 @@ def record_satellite_info():
 
 def do_downloads():
     # Open a WMTS source
-    global src # the opened url for satellite images
+    global src  # the opened url for satellite images
     global start, bound_string
     global total_tiles
     try:
@@ -799,7 +799,7 @@ def main():
     if os.path.isfile(args.mbtiles):
         mbTiles  = MBTiles(args.mbtiles)
         bounds = mbTiles.get_bounds()
-    if False: #else:
+    if False:  #else:
         print('Failed to open %s -- Quitting'%args.mbtiles)
         sys.exit()
     if args.get != None:
