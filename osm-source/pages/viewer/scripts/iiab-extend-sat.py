@@ -311,7 +311,7 @@ class MBTiles():
         resp = self.c.execute(sql)
         rows = resp.fetchall()
         for row in rows:
-            self.bounds[row['zoom_level']] = { 'minX': row['min(tile_column)'],\
+            self.bounds[row['zoom_level']] = {'minX': row['min(tile_column)'],\
                                   'maxX': row['max(tile_column)'],\
                                   'minY': row['min(tile_row)'],\
                                   'maxY': row['max(tile_row)'],\
@@ -331,7 +331,7 @@ class MBTiles():
         for row in rows:
             if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
                 print('%s %s %s %s %s %s %s'%(row[0], row[1], row[2], row[3], row[4],\
-                row[5], (row[2]-row[1]+1) * ( row[4]-row[3]+1)))
+                row[5], (row[2]-row[1]+1) * (row[4]-row[3]+1)))
             self.SetSatMetaData(row[0], 'minX', row[1])
             self.SetSatMetaData(row[0], 'maxX', row[2])
             self.SetSatMetaData(row[0], 'minY', row[3])
@@ -510,7 +510,7 @@ class Extract(object):
     def human_readable(num):
         # return 3 significant digits and unit specifier
         num = float(num)
-        units = [ '', 'K', 'M', 'G']
+        units = ['', 'K', 'M', 'G']
         for i in range(4):
             if num<10.0:
                 return "%.2f%s"%(num, units[i])
@@ -542,7 +542,7 @@ class Extract(object):
             cur_box['east'], cur_box['north'], zoom)
             # print(xmin,xmax,ymin,ymax,zoom)
             tot_tiles = mbTiles.CountTiles(zoom)
-            bbox_limits[zoom] = { 'minX': xmin, 'maxX': xmax, 'minY': ymin, 'maxY': ymax, \
+            bbox_limits[zoom] = {'minX': xmin, 'maxX': xmax, 'minY': ymin, 'maxY': ymax, \
                               'count': tot_tiles}
         with open('/tmp/bbox_limits', 'w') as fp:
             fp.write(json.dumps(bbox_limits, indent=2))
