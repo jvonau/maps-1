@@ -69,11 +69,11 @@ class Tools(object):
 
     def latlon2xy(self, lat, lon, z):
         n = self.numTiles(z)
-        x,y = self.latlon2relativeXY(lat, lon)
+        x, y = self.latlon2relativeXY(lat, lon)
         return(n*x, n*y)
 
     def tileXY(self, lat, lon, z):
-        x,y = self.latlon2xy(lat, lon, z)
+        x, y = self.latlon2xy(lat, lon, z)
         return(int(x), int(y))
 
     def xy2latlon(self, x, y, z):
@@ -100,8 +100,8 @@ class Tools(object):
         return(lon1, lon2)
 
     def tileEdges(self, x, y, z):
-        lat1,lat2 = latEdges(y, z)
-        lon1,lon2 = lonEdges(x, z)
+        lat1, lat2 = latEdges(y, z)
+        lon1, lon2 = lonEdges(x, z)
         return((lat2, lon1, lat1, lon2)) # S,W,N,E
 
     def mercatorToLat(self, mercatorY):
@@ -209,8 +209,8 @@ class MBTiles():
 
         self.conn.commit()
 
-    def GetSatMetaData(self,zoomLevel):
-        rows = self.c.execute("SELECT name, value FROM satdata WHERE zoom_level = ?",(str(zoomLevel),))
+    def GetSatMetaData(self, zoomLevel):
+        rows = self.c.execute("SELECT name, value FROM satdata WHERE zoom_level = ?", (str(zoomLevel),))
         out = {}
         for row in rows:
             out[row[0]] = row[1]
@@ -235,26 +235,26 @@ class MBTiles():
             tile_id = uuid.uuid4().hex
             operation = 'update images'
             self.c.execute("DELETE FROM images  WHERE tile_id = ?;", ([tile_id]))
-            self.c.execute("INSERT INTO images (tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
+            self.c.execute("INSERT INTO images (tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data), tile_id))
             if self.c.rowcount != 1:
-                raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
+                raise RuntimeError("Failure %s RowCount:%s"%(operation, self.c.rowcount))
             self.c.execute("""UPDATE map SET tile_id=? where zoom_level = ? AND
                 tile_column = ? AND tile_row = ?;""",
                 (tile_id, zoomLevel, tileColumn, tileRow))
             if self.c.rowcount != 1:
-                raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
+                raise RuntimeError("Failure %s RowCount:%s"%(operation, self.c.rowcount))
             self.conn.commit()
             return
         else: # this is not an update
             tile_id = uuid.uuid4().hex
-            self.c.execute("INSERT INTO images ( tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data),tile_id))
+            self.c.execute("INSERT INTO images ( tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data), tile_id))
             if self.c.rowcount != 1:
                 raise RuntimeError("Insert image failure")
             operation = 'insert into map'
             self.c.execute("INSERT INTO map (zoom_level, tile_column, tile_row, tile_id) VALUES (?, ?, ?, ?);",
                 (zoomLevel, tileColumn, tileRow, tile_id))
         if self.c.rowcount != 1:
-            raise RuntimeError("Failure %s RowCount:%s"%(operation,self.c.rowcount))
+            raise RuntimeError("Failure %s RowCount:%s"%(operation, self.c.rowcount))
             self.conn.commit()
 
 
@@ -266,8 +266,8 @@ class MBTiles():
         if not tile_id:
             raise RuntimeError("Tile not found")
 
-        self.c.execute("DELETE FROM images WHERE tile_id = ?;",tile_id)
-        self.c.execute("DELETE FROM map WHERE tile_id = ?;",tile_id)
+        self.c.execute("DELETE FROM images WHERE tile_id = ?;", tile_id)
+        self.c.execute("DELETE FROM map WHERE tile_id = ?;", tile_id)
         self.conn.commit()
 
     def TileExists(self, zoomLevel, tileColumn, tileRow):
@@ -275,7 +275,7 @@ class MBTiles():
             self.CheckSchema()
 
         sql = 'select tile_id from map where zoom_level = ? and tile_column = ? and tile_row = ?'
-        self.c.execute(sql,(zoomLevel, tileColumn, tileRow))
+        self.c.execute(sql, (zoomLevel, tileColumn, tileRow))
         row = self.c.fetchall()
         if len(row) == 0:
             return None
@@ -291,7 +291,7 @@ class MBTiles():
             return
         try:
             #wmts_row = int(2 ** zoomLevel - tileRow - 1)
-            r = src.get(zoomLevel,tileColumn,tileRow)
+            r = src.get(zoomLevel, tileColumn, tileRow)
         except Exception as e:
             raise RuntimeError("Source data failure;%s"%e)
 
@@ -317,9 +317,9 @@ class MBTiles():
                                   'maxY': row['max(tile_row)'],\
                                   'count': row['count(zoom_level)'],\
                                  }
-        outstr = json.dumps(self.bounds,indent=2)
+        outstr = json.dumps(self.bounds, indent=2)
         # diagnostic info
-        with open('/tmp/bounds.json','w') as bounds_fp:
+        with open('/tmp/bounds.json', 'w') as bounds_fp:
             bounds_fp.write(outstr)
         return self.bounds
 
@@ -330,49 +330,49 @@ class MBTiles():
         print('Zoom Levels Found:%s'%len(rows))
         for row in rows:
             if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
-                print('%s %s %s %s %s %s %s'%(row[0],row[1],row[2],row[3],row[4],\
+                print('%s %s %s %s %s %s %s'%(row[0], row[1], row[2], row[3], row[4],\
                 row[5], (row[2]-row[1]+1) * ( row[4]-row[3]+1)))
-            self.SetSatMetaData(row[0],'minX',row[1])
-            self.SetSatMetaData(row[0],'maxX',row[2])
-            self.SetSatMetaData(row[0],'minY',row[3])
-            self.SetSatMetaData(row[0],'maxY',row[4])
-            self.SetSatMetaData(row[0],'count',row[5])
+            self.SetSatMetaData(row[0],'minX', row[1])
+            self.SetSatMetaData(row[0],'maxX', row[2])
+            self.SetSatMetaData(row[0],'minY', row[3])
+            self.SetSatMetaData(row[0],'maxY', row[4])
+            self.SetSatMetaData(row[0],'count', row[5])
 
-    def CountTiles(self,zoom):
-        self.c.execute("select tile_data from tiles where zoom_level = ?",(zoom,))
+    def CountTiles(self, zoom):
+        self.c.execute("select tile_data from tiles where zoom_level = ?", (zoom,))
         num = 0
         while self.c.fetchone():
             num += 1
         return num
 
-    def execute_script(self,script):
+    def execute_script(self, script):
         self.c.executescript(script)
 
-    def copy_zoom(self,zoom,src):
+    def copy_zoom(self, zoom, src):
         sql = 'ATTACH DATABASE "%s" as src'%src
         self.c.execute(sql)
         sql = 'INSERT INTO map SELECT * from src.map where src.map.zoom_level=?'
-        self.c.execute(sql,[zoom])
+        self.c.execute(sql, [zoom])
         sql = 'INSERT OR IGNORE INTO images SELECT src.images.tile_data, src.images.tile_id from src.images JOIN src.map ON src.map.tile_id = src.images.tile_id where map.zoom_level=?'
-        self.c.execute(sql,[zoom])
+        self.c.execute(sql, [zoom])
         sql = 'DETACH DATABASE src'
         self.c.execute(sql)
 
-    def copy_mbtile(self,src):
+    def copy_mbtile(self, src):
         sql = 'ATTACH DATABASE "%s" as src'%src
         self.c.execute(sql)
         sql = 'INSERT INTO map SELECT * from src.map where true'
-        self.c.execute(sql,[zoom])
+        self.c.execute(sql, [zoom])
         sql = 'INSERT OR IGNORE INTO images SELECT src.images.tile_data, src.images.tile_id from src.images JOIN src.map ON src.map.tile_id = src.images.tile_id where true'
-        self.c.execute(sql,[zoom])
+        self.c.execute(sql, [zoom])
         sql = 'DETACH DATABASE src'
         self.c.execute(sql)
 
-    def delete_zoom(self,zoom):
+    def delete_zoom(self, zoom):
         sql = 'DELETE FROM images where tile_id in (SELECT tile_id from map WHERE map.zoom_level=?)'
-        self.c.execute(sql,[zoom])
+        self.c.execute(sql, [zoom])
         sql = 'DELETE FROM map where zoom_level=?'
-        self.c.execute(sql,[zoom])
+        self.c.execute(sql, [zoom])
         sql = "vacuum"
         self.c.execute(sql)
         self.Commit()
@@ -387,14 +387,14 @@ class MBTiles():
         self.c.execute(sql)
         self.Commit()
 
-    def insert_sat_info(self,perma_ref,bounds,coordinates,date_downloaded,
-                       tiles_downloaded,command_line,magic_number,
+    def insert_sat_info(self, perma_ref, bounds, coordinates, date_downloaded,
+                       tiles_downloaded, command_line, magic_number,
                        min_zoom,max_zoom):
         sql = '''insert into satellite_info (perma_ref,bounds,coordinates,
                date_downloaded,tiles_downloaded,command_line,
                magic_number,min_zoom,max_zoom) values (?,?,?,?,?,?,?,?,?)'''
-        self.c.execute(sql,(perma_ref,bounds,coordinates,date_downloaded,
-                     tiles_downloaded,command_line,magic_number,min_zoom,max_zoom,))
+        self.c.execute(sql,(perma_ref, bounds, coordinates, date_downloaded,
+                     tiles_downloaded, command_line, magic_number, min_zoom, max_zoom,))
         self.Commit()
 
 class WMTS(object):
@@ -404,28 +404,28 @@ class WMTS(object):
         self.http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',\
             ca_certs=certifi.where())
 
-    def get(self,z,x,y):
+    def get(self, z, x, y):
         srcurl = "%s"%self.template
-        srcurl = srcurl.replace('{z}',str(z))
-        srcurl = srcurl.replace('{x}',str(x))
-        srcurl = srcurl.replace('{y}',str(y))
+        srcurl = srcurl.replace('{z}', str(z))
+        srcurl = srcurl.replace('{x}', str(x))
+        srcurl = srcurl.replace('{y}', str(y))
         # print(srcurl[-50:])
-        resp = (self.http.request("GET",srcurl,retries=10))
+        resp = (self.http.request("GET", srcurl,retries=10))
         return(resp)
 
     def parse_args():
         parser = argparse.ArgumentParser(description="Download WMTS tiles arount a point.")
-        parser.add_argument('-z',"--zoom", help="zoom level minimum", type=int,default=10)
+        parser.add_argument('-z', "--zoom", help="zoom level minimum", type=int,default=10)
         parser.add_argument("-m", "--mbtiles", help="mbtiles filename.")
-        parser.add_argument("-v", "--verify", help="verify mbtiles.",action='store_true')
-        parser.add_argument("-f", "--fix", help="fix invalid tiles.",action='store_true')
+        parser.add_argument("-v", "--verify", help="verify mbtiles.", action='store_true')
+        parser.add_argument("-f", "--fix", help="fix invalid tiles.", action='store_true')
         parser.add_argument("-n", "--name", help="Output filename.")
-        parser.add_argument("--lat", help="Latitude degrees.",type=float)
-        parser.add_argument("--lon", help="Longitude degrees.",type=float)
-        parser.add_argument("-r","--radius", help="Download within this radius(km).",type=float,default=0.0)
-        parser.add_argument('-t',"--topzoom", help="top zoom level plus one,default=14", type=int,default=14)
+        parser.add_argument("--lat", help="Latitude degrees.", type=float)
+        parser.add_argument("--lon", help="Longitude degrees.", type=float)
+        parser.add_argument("-r", "--radius", help="Download within this radius(km).", type=float,default=0.0)
+        parser.add_argument('-t', "--topzoom", help="top zoom level plus one,default=14", type=int,default=14)
         parser.add_argument("-g", "--get", help='get WMTS tiles from this URL(Default: Sentinel Cloudless).')
-        parser.add_argument("-s", "--summarize", help="Data about each zoom level.",action="store_true")
+        parser.add_argument("-s", "--summarize", help="Data about each zoom level.", action="store_true")
         return parser.parse_args()
 
 class Extract(object):
@@ -489,50 +489,50 @@ class Extract(object):
         except:
             print('failed to open source')
             sys.exit(1)
-        response = src.get(args.zoom,args.x,args.y)
+        response = src.get(args.zoom, args.x, args.y)
         print(response.status)
         print(len(response.data))
         print(response.data)
 
     def put_config():
         global config
-        with open(config_fn,'w') as cf:
-            cf.write(json.dumps(config,indent=2))
+        with open(config_fn, 'w') as cf:
+            cf.write(json.dumps(config, indent=2))
 
     def get_config():
         global config
         if not os.path.exists(config_fn):
             put_config()
 
-        with open(config_fn,'r') as cf:
+        with open(config_fn, 'r') as cf:
             config = json.loads(cf.read())
 
     def human_readable(num):
         # return 3 significant digits and unit specifier
         num = float(num)
-        units = [ '','K','M','G']
+        units = [ '', 'K', 'M', 'G']
         for i in range(4):
             if num<10.0:
-                return "%.2f%s"%(num,units[i])
+                return "%.2f%s"%(num, units[i])
             if num<100.0:
-                return "%.1f%s"%(num,units[i])
+                return "%.1f%s"%(num, units[i])
             if num < 1000.0:
-                return "%.0f%s"%(num,units[i])
+                return "%.0f%s"%(num, units[i])
             num /= 1000.0
 
-    def get_bounds(lat_deg,lon_deg,radius_km,zoom=13):
+    def get_bounds(lat_deg, lon_deg, radius_km, zoom=13):
         n = 2.0 ** zoom
         tile_kmeters = earth_circum / n
         # print('tile dim(km):%s'%tile_kmeters)
         per_pixel = tile_kmeters / 256 * 1000
         # print('%s meters per pixel'%per_pixel)
-        tileX,tileY = coordinates2WmtsTilesNumbers(lat_deg,lon_deg,zoom)
+        tileX,tileY = coordinates2WmtsTilesNumbers(lat_deg, lon_deg, zoom)
         tile_radius = radius_km / tile_kmeters
         minX = int(tileX - tile_radius)
         maxX = int(tileX + tile_radius + 1)
         minY = int(tileY - tile_radius)
         maxY = int(tileY + tile_radius + 1)
-        return (minX,maxX,minY,maxY)
+        return (minX, maxX, minY, maxY)
 
     def record_bbox_debug_info():
         global bbox_limits
