@@ -494,11 +494,10 @@ class Extract(object):
         print(len(response.data))
         print(response.data)
 
-
     def put_config():
         global config
         with open(config_fn,'w') as cf:
-        cf.write(json.dumps(config,indent=2))
+            cf.write(json.dumps(config,indent=2))
 
     def get_config():
         global config
@@ -506,7 +505,7 @@ class Extract(object):
             put_config()
 
         with open(config_fn,'r') as cf:
-        config = json.loads(cf.read())
+            config = json.loads(cf.read())
 
     def human_readable(num):
         # return 3 significant digits and unit specifier
@@ -572,7 +571,7 @@ class Extract(object):
         magic_number = int(lat_deg * lon_deg * radius)
         bboxes = osm_dir + "/bboxes.geojson"
         with open(bboxes,"r") as bounding_geojson:
-        data = geojson.load(bounding_geojson)
+            data = geojson.load(bounding_geojson)
         #feature_collection = FeatureCollection(data['features'])
         magic_number_found = False
         for feature in data['features']:
@@ -684,8 +683,8 @@ def replace_tile(src,zoom,tileX,tileY):
             mbTiles.SetTile(zoom, tileX, tileY, r.data)
             returned = mbTiles.GetTile(zoom, tileX, tileY)
             if bytearray(returned) != r.data:
-               print('read verify in replace_tile failed')
-               return False
+                print('read verify in replace_tile failed')
+                return False
             return True
         else:
             print('get url in replace_tile returned:%s'%r.status)
@@ -732,7 +731,7 @@ def set_up_target_db(name='sentinel'):
         if not os.path.exists(dbpath):
         # if True:
         #    shutil.copyfile('%s/%s'%(sat_dir,sat_mbtile_fname),dbpath)
-        pass
+            pass
     print('Opening %s'%dbpath)
     mbTiles = MBTiles(dbpath)
     mbTiles.CheckSchema()
@@ -832,8 +831,8 @@ def main():
     do_downloads()
 
     # save input for debugging in /tmp
-    # shutil.copy('%s/%s'%(sat_dir,sat_mbtile_fname),'/tmp/%s'%(sat_mbtile_fname)) 
-    # os.replace('%s/%s'%(work_dir,sat_mbtile_fname),'%s/%s'%(sat_dir,sat_mbtile_fname)) 
+    # shutil.copy('%s/%s'%(sat_dir,sat_mbtile_fname),'/tmp/%s'%(sat_mbtile_fname))
+    # os.replace('%s/%s'%(work_dir,sat_mbtile_fname),'%s/%s'%(sat_dir,sat_mbtile_fname))
 
 if __name__ == "__main__":
     # Run the main routine
