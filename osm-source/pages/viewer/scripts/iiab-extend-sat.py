@@ -256,7 +256,6 @@ class MBTiles():
             raise RuntimeError("Failure %s RowCount:%s" % (operation, self.c.rowcount))
             self.conn.commit()
 
-
     def DeleteTile(self, zoomLevel, tileColumn, tileRow):
         if not self.schemaReady:
             self.CheckSchema()
@@ -553,7 +552,6 @@ class Extract(object):
         # returns (west, south, east, north)
         return (north_west_point[1], south_east_point[0], south_east_point[1], north_west_point[0])
 
-
     def coordinates2WmtsTilesNumbers(lat_deg, lon_deg, zoom):
         lat_rad = math.radians(lat_deg)
         n = 2.0 ** zoom
@@ -607,7 +605,6 @@ class Extract(object):
         set_up_target_db('fix_try')
         bad_ref = open('/tmp/bad_tiles', 'w')
 
-
     def scan_verify():
         global src  # the opened url for satellite images
         if args.fix:
@@ -647,8 +644,8 @@ class Extract(object):
                                 unfixable += 1
                             if tileY % 20 == 0:
                                 print('replaced:%s  ok:%s' % (replaced, ok))
-                    print ('bad', bad, 'ok', ok, 'empty', empty, 'html', html, 'unfixable', unfixable, 'zoom', zoom, 'replaced', replaced)
-            print ('bad', bad, 'ok', ok, 'empty', empty, 'html', html, 'unfixable', unfixable)
+                    print('bad', bad, 'ok', ok, 'empty', empty, 'html', html, 'unfixable', unfixable, 'zoom', zoom, 'replaced', replaced)
+            print('bad', bad, 'ok', ok, 'empty', empty, 'html', html, 'unfixable', unfixable)
             if args.fix:
                 bad_ref.close()
 
@@ -795,7 +792,7 @@ def main():
     if os.path.isfile(args.mbtiles):
         mbTiles  = MBTiles(args.mbtiles)
         bounds = mbTiles.get_bounds()
-    if False:  #else:
+    if False:  # else:
         print('Failed to open %s -- Quitting' % args.mbtiles)
         sys.exit()
     if args.get != None:
@@ -829,6 +826,7 @@ def main():
     # save input for debugging in /tmp
     # shutil.copy('%s/%s'%(sat_dir,sat_mbtile_fname),'/tmp/%s'%(sat_mbtile_fname))
     # os.replace('%s/%s'%(work_dir,sat_mbtile_fname),'%s/%s'%(sat_dir,sat_mbtile_fname))
+
 
 if __name__ == "__main__":
     # Run the main routine
