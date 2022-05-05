@@ -151,7 +151,7 @@ class MBTiles():
 
     def GetTile(self, zoomLevel, tileColumn, tileRow):
         rows = self.c.execute("SELECT tile_data FROM tiles WHERE zoom_level = ? AND tile_column = ? AND tile_row = ?",
-         (zoomLevel, tileColumn, tileRow))
+                              (zoomLevel, tileColumn, tileRow))
         rows = list(rows)
         if len(rows) == 0:
             raise RuntimeError("Tile not found")
@@ -239,8 +239,7 @@ class MBTiles():
             if self.c.rowcount != 1:
                 raise RuntimeError("Failure %s RowCount:%s" % (operation, self.c.rowcount))
             self.c.execute("""UPDATE map SET tile_id=? where zoom_level = ? AND
-                tile_column = ? AND tile_row = ?;""",
-                (tile_id, zoomLevel, tileColumn, tileRow))
+                tile_column = ? AND tile_row = ?;""", (tile_id, zoomLevel, tileColumn, tileRow))
             if self.c.rowcount != 1:
                 raise RuntimeError("Failure %s RowCount:%s" % (operation, self.c.rowcount))
             self.conn.commit()
@@ -252,7 +251,7 @@ class MBTiles():
                 raise RuntimeError("Insert image failure")
             operation = 'insert into map'
             self.c.execute("INSERT INTO map (zoom_level, tile_column, tile_row, tile_id) VALUES (?, ?, ?, ?);",
-                (zoomLevel, tileColumn, tileRow, tile_id))
+                           (zoomLevel, tileColumn, tileRow, tile_id))
         if self.c.rowcount != 1:
             raise RuntimeError("Failure %s RowCount:%s" % (operation, self.c.rowcount))
             self.conn.commit()
@@ -312,11 +311,10 @@ class MBTiles():
         rows = resp.fetchall()
         for row in rows:
             self.bounds[row['zoom_level']] = {'minX': row['min(tile_column)'],
-                                  'maxX': row['max(tile_column)'],
-                                  'minY': row['min(tile_row)'],
-                                  'maxY': row['max(tile_row)'],
-                                  'count': row['count(zoom_level)'],
-                                 }
+                                              'maxX': row['max(tile_column)'],
+                                              'minY': row['min(tile_row)'],
+                                              'maxY': row['max(tile_row)'],
+                                              'count': row['count(zoom_level)'], }
         outstr = json.dumps(self.bounds, indent=2)
         # diagnostic info
         with open('/tmp/bounds.json', 'w') as bounds_fp:
@@ -331,7 +329,7 @@ class MBTiles():
         for row in rows:
             if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
                 print('%s %s %s %s %s %s %s' % (row[0], row[1], row[2], row[3], row[4],
-                row[5], (row[2]-row[1]+1) * (row[4]-row[3]+1)))
+                                                row[5], (row[2]-row[1]+1) * (row[4]-row[3]+1)))
             self.SetSatMetaData(row[0], 'minX', row[1])
             self.SetSatMetaData(row[0], 'maxX', row[2])
             self.SetSatMetaData(row[0], 'minY', row[3])
@@ -388,21 +386,19 @@ class MBTiles():
         self.Commit()
 
     def insert_sat_info(self, perma_ref, bounds, coordinates, date_downloaded,
-                       tiles_downloaded, command_line, magic_number,
-                       min_zoom, max_zoom):
+                        tiles_downloaded, command_line, magic_number, min_zoom, max_zoom):
         sql = '''insert into satellite_info (perma_ref,bounds,coordinates,
                date_downloaded,tiles_downloaded,command_line,
                magic_number,min_zoom,max_zoom) values (?,?,?,?,?,?,?,?,?)'''
         self.c.execute(sql, (perma_ref, bounds, coordinates, date_downloaded,
-                     tiles_downloaded, command_line, magic_number, min_zoom, max_zoom,))
+                             tiles_downloaded, command_line, magic_number, min_zoom, max_zoom,))
         self.Commit()
 
 class WMTS(object):
 
     def __init__(self, template):
         self.template = template
-        self.http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED',
-            ca_certs=certifi.where())
+        self.http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
     def get(self, z, x, y):
         srcurl = "%s" % self.template
@@ -539,11 +535,11 @@ class Extract(object):
         cur_box = regions[region]
         for zoom in range(bbox_zoom_start-1, 14):
             xmin, xmax, ymin, ymax = bbox_tile_limits(cur_box['west'], cur_box['south'],
-            cur_box['east'], cur_box['north'], zoom)
+                                                      cur_box['east'], cur_box['north'], zoom)
             # print(xmin,xmax,ymin,ymax,zoom)
             tot_tiles = mbTiles.CountTiles(zoom)
             bbox_limits[zoom] = {'minX': xmin, 'maxX': xmax, 'minY': ymin, 'maxY': ymax,
-                              'count': tot_tiles}
+                                 'count': tot_tiles}
         with open('/tmp/bbox_limits', 'w') as fp:
             fp.write(json.dumps(bbox_limits, indent=2))
 
@@ -588,7 +584,7 @@ class Extract(object):
         poly = Polygon([[[west, south], [east, south], [east, north], [west, north], [west, south]]])
         if not magic_number_found:
             data['features'].append(Feature(geometry=poly, properties={"name": 'satellite',
-                           "magic_number": magic_number}))
+                                                                       "magic_number": magic_number}))
 
         collection = FeatureCollection(data['features'])
         bboxes = osm_dir + "/bboxes.geojson"
@@ -754,8 +750,8 @@ def record_satellite_info():
         command_line += nibble + ' '
     bounds_string = str(bounds)
     mbTiles.insert_sat_info(perma_ref, bounds_string, coordinates, date_downloaded,
-                       tiles_downloaded, command_line, magic_number,
-                       min_zoom, max_zoom)
+                            tiles_downloaded, command_line, magic_number,
+                            min_zoom, max_zoom)
 
 def do_downloads():
     # Open a WMTS source
