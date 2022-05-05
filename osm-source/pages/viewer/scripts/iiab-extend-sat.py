@@ -620,7 +620,7 @@ class Extract(object):
             # if zoom == 5: sys.exit()
             bad = ok = empty = html = 0
             for tileY in range(bounds[zoom]['minY'], bounds[zoom]['maxY'] + 1):
-            # print("New Y:%s on zoom:%s"%(tileY,zoom))
+                # print("New Y:%s on zoom:%s"%(tileY,zoom))
                 for tileX in range(bounds[zoom]['minX'], bounds[zoom]['maxX'] + 1):
                     # print('tileX:%s'%tileX)
                     replace = False
@@ -704,7 +704,7 @@ def download_tiles(src, lat_deg, lon_deg, zoom, radius):
         for tileY in range(tileY_min, tileY_max+1):
             if (total_tiles % 10) == 0:
                 print('tileX:%s tileY:%s zoom:%s already-downloaded:%s added:%s' % (tileX, tileY, zoom, ok, total_tiles), flush=True)
-                tile_exists =  mbTiles.TileExists(zoom, tileX, tileY)
+                tile_exists = mbTiles.TileExists(zoom, tileX, tileY)
             if tile_exists != None:
                 raw = mbTiles.GetTile(zoom, tileX, tileY)
             try:
@@ -729,8 +729,8 @@ def set_up_target_db(name='sentinel'):
         work_dir = '/tmp'
         dbpath = '%s/%s' % (work_dir, dbname)
         if not os.path.exists(dbpath):
-        # if True:
-        #    shutil.copyfile('%s/%s'%(sat_dir,sat_mbtile_fname),dbpath)
+            # if True:
+            # shutil.copyfile('%s/%s'%(sat_dir,sat_mbtile_fname),dbpath)
             pass
     print('Opening %s' % dbpath)
     mbTiles = MBTiles(dbpath)
@@ -800,7 +800,7 @@ def main():
         args.mbtiles = sat_dir + '/' + sat_mbtile_fname
     print('mbtiles SOURCE filename:%s' % args.mbtiles)
     if os.path.isfile(args.mbtiles):
-        mbTiles  = MBTiles(args.mbtiles)
+        mbTiles = MBTiles(args.mbtiles)
         bounds = mbTiles.get_bounds()
     if False:  # else:
         print('Failed to open %s -- Quitting' % args.mbtiles)
@@ -809,7 +809,7 @@ def main():
         print('get specified')
         url = args.get
     else:
-        url =  "https://tiles.maps.eox.at/wmts?layer=s2cloudless-2020_3857&style=default&tilematrixset=g&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}"
+        url = "https://tiles.maps.eox.at/wmts?layer=s2cloudless-2020_3857&style=default&tilematrixset=g&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fjpeg&TileMatrix={z}&TileCol={x}&TileRow={y}"
     if args.summarize:
         mbTiles.summarize()
         sys.exit(0)
