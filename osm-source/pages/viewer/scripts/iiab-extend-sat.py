@@ -223,7 +223,7 @@ class MBTiles():
         self.c.execute("DELETE FROM satdata WHERE name = ? AND zoom_level = ?", (zoomLevel, name,))
         self.conn.commit()
         if self.c.rowcount == 0:
-            raise RuntimeError("SatData name %s not found"%name)
+            raise RuntimeError("SatData name %s not found" % name)
 
     def SetTile(self, zoomLevel, tileColumn, tileRow, data):
         if not self.schemaReady:
@@ -237,12 +237,12 @@ class MBTiles():
             self.c.execute("DELETE FROM images  WHERE tile_id = ?;", ([tile_id]))
             self.c.execute("INSERT INTO images (tile_data,tile_id) VALUES ( ?, ?);", (sqlite3.Binary(data), tile_id))
             if self.c.rowcount != 1:
-                raise RuntimeError("Failure %s RowCount:%s"%(operation, self.c.rowcount))
+                raise RuntimeError("Failure %s RowCount:%s" % (operation, self.c.rowcount))
             self.c.execute("""UPDATE map SET tile_id=? where zoom_level = ? AND
                 tile_column = ? AND tile_row = ?;""",
                 (tile_id, zoomLevel, tileColumn, tileRow))
             if self.c.rowcount != 1:
-                raise RuntimeError("Failure %s RowCount:%s"%(operation, self.c.rowcount))
+                raise RuntimeError("Failure %s RowCount:%s" % (operation, self.c.rowcount))
             self.conn.commit()
             return
         else:  # this is not an update
@@ -254,7 +254,7 @@ class MBTiles():
             self.c.execute("INSERT INTO map (zoom_level, tile_column, tile_row, tile_id) VALUES (?, ?, ?, ?);",
                 (zoomLevel, tileColumn, tileRow, tile_id))
         if self.c.rowcount != 1:
-            raise RuntimeError("Failure %s RowCount:%s"%(operation, self.c.rowcount))
+            raise RuntimeError("Failure %s RowCount:%s" % (operation, self.c.rowcount))
             self.conn.commit()
 
 
@@ -293,7 +293,7 @@ class MBTiles():
             # wmts_row = int(2 ** zoomLevel - tileRow - 1)
             r = src.get(zoomLevel, tileColumn, tileRow)
         except Exception as e:
-            raise RuntimeError("Source data failure;%s"%e)
+            raise RuntimeError("Source data failure;%s" % e)
 
         if r.status == 200:
             lock.acquire()
@@ -301,7 +301,7 @@ class MBTiles():
             self.conn.commit()
             lock.release()
         else:
-            print('Sat data error, returned:%s'%r.status)
+            print('Sat data error, returned:%s' % r.status)
 
     def Commit(self):
         self.conn.commit()
@@ -327,10 +327,10 @@ class MBTiles():
         sql = 'select zoom_level, min(tile_column),max(tile_column),min(tile_row),max(tile_row), count(zoom_level) from tiles group by zoom_level;'
         self.c.execute(sql)
         rows = self.c.fetchall()
-        print('Zoom Levels Found:%s'%len(rows))
+        print('Zoom Levels Found:%s' % len(rows))
         for row in rows:
             if row[2] != None and row[1] != None and row[3] != None and row[4] != None:
-                print('%s %s %s %s %s %s %s'%(row[0], row[1], row[2], row[3], row[4],
+                print('%s %s %s %s %s %s %s' % (row[0], row[1], row[2], row[3], row[4],
                 row[5], (row[2]-row[1]+1) * (row[4]-row[3]+1)))
             self.SetSatMetaData(row[0], 'minX', row[1])
             self.SetSatMetaData(row[0], 'maxX', row[2])
@@ -349,7 +349,7 @@ class MBTiles():
         self.c.executescript(script)
 
     def copy_zoom(self, zoom, src):
-        sql = 'ATTACH DATABASE "%s" as src'%src
+        sql = 'ATTACH DATABASE "%s" as src' % src
         self.c.execute(sql)
         sql = 'INSERT INTO map SELECT * from src.map where src.map.zoom_level=?'
         self.c.execute(sql, [zoom])
@@ -359,7 +359,7 @@ class MBTiles():
         self.c.execute(sql)
 
     def copy_mbtile(self, src):
-        sql = 'ATTACH DATABASE "%s" as src'%src
+        sql = 'ATTACH DATABASE "%s" as src' % src
         self.c.execute(sql)
         sql = 'INSERT INTO map SELECT * from src.map where true'
         self.c.execute(sql, [zoom])
@@ -405,7 +405,7 @@ class WMTS(object):
             ca_certs=certifi.where())
 
     def get(self, z, x, y):
-        srcurl = "%s"%self.template
+        srcurl = "%s" % self.template
         srcurl = srcurl.replace('{z}', str(z))
         srcurl = srcurl.replace('{x}', str(x))
         srcurl = srcurl.replace('{y}', str(y))
@@ -512,12 +512,12 @@ class Extract(object):
         num = float(num)
         units = ['', 'K', 'M', 'G']
         for i in range(4):
-            if num<10.0:
-                return "%.2f%s"%(num, units[i])
-            if num<100.0:
-                return "%.1f%s"%(num, units[i])
+            if num < 10.0:
+                return "%.2f%s" % (num, units[i])
+            if num < 100.0:
+                return "%.1f%s" % (num, units[i])
             if num < 1000.0:
-                return "%.0f%s"%(num, units[i])
+                return "%.0f%s" % (num, units[i])
             num /= 1000.0
 
     def get_bounds(lat_deg, lon_deg, radius_km, zoom=13):
@@ -580,11 +580,11 @@ class Extract(object):
         features = []
         (west, south, east, north) = get_degree_extent(lat_deg, lon_deg, radius, zoom)
         # print('west:%s, south:%s, east:%s, north:%s'%(west, south, east, north))
-        west=float(west)
-        south=float(south)
-        east=float(east)
-        north=float(north)
-        bound_string = "%s,%s,%s,%s"%(west, south, east, north)
+        west = float(west)
+        south = float(south)
+        east = float(east)
+        north = float(north)
+        bound_string = "%s,%s,%s,%s" % (west, south, east, north)
         poly = Polygon([[[west, south], [east, south], [east, north], [west, north], [west, south]]])
         if not magic_number_found:
             data['features'].append(Feature(geometry=poly, properties={"name": 'satellite',
@@ -618,7 +618,7 @@ class Extract(object):
             create_clone()
         replaced = bad = ok = empty = html = unfixable = 0
         mbTiles = MBTiles(args.mbtiles)
-        print('Opening database %s'%args.mbtiles)
+        print('Opening database %s' % args.mbtiles)
         for zoom in sorted(bounds.keys()):
             # if zoom == 5: sys.exit()
             bad = ok = empty = html = 0
@@ -632,7 +632,7 @@ class Extract(object):
                         image = Image.open(io.BytesIO(raw))
                         ok += 1
                         if len(raw) < 800:
-                            replace=True
+                            replace = True
                         else:
                             continue
                     except Exception as e:
@@ -640,17 +640,17 @@ class Extract(object):
                         replace = True
                         line = bytearray(raw)
                         if line.find("DOCTYPE") != -1:
-                            html +=1
+                            html += 1
                         if args.fix and replace:
                             success = replace_tile(src, zoom, tileX, tileY)
                             if success:
-                                bad_ref.write('%s,%s,%s\n'%(zoom, tileX, tileY))
+                                bad_ref.write('%s,%s,%s\n' % (zoom, tileX, tileY))
                                 replaced += 1
                             else:
-                                bad_ref.write('%s,%s,%s\n'%(zoom, tileX, tileY))
+                                bad_ref.write('%s,%s,%s\n' % (zoom, tileX, tileY))
                                 unfixable += 1
                             if tileY % 20 == 0:
-                                print('replaced:%s  ok:%s'%(replaced, ok))
+                                print('replaced:%s  ok:%s' % (replaced, ok))
                     print ('bad', bad, 'ok', ok, 'empty', empty, 'html', html, 'unfixable', unfixable, 'zoom', zoom, 'replaced', replaced)
             print ('bad', bad, 'ok', ok, 'empty', empty, 'html', html, 'unfixable', unfixable)
             if args.fix:
@@ -668,7 +668,7 @@ def replace_tile(src, zoom, tileX, tileY):
             raw = r.data
             line = bytearray(raw)
             if line.find(b"DOCTYPE") != -1:
-                print('Sentinel Cloudless returned text rather than an image -- %s retrys'%tries)
+                print('Sentinel Cloudless returned text rather than an image -- %s retrys' % tries)
                 continue
             else:
                 try:
@@ -677,7 +677,7 @@ def replace_tile(src, zoom, tileX, tileY):
                     total_tiles += 1
                     # image.show(io.BytesIO(raw))
                 except Exception as e:
-                    print('exception:%s'%e)
+                    print('exception:%s' % e)
                     sys.exit()
                     # input("PRESS ENTER")
             mbTiles.SetTile(zoom, tileX, tileY, r.data)
@@ -687,7 +687,7 @@ def replace_tile(src, zoom, tileX, tileY):
                 return False
             return True
         else:
-            print('get url in replace_tile returned:%s'%r.status)
+            print('get url in replace_tile returned:%s' % r.status)
             return False
 
 def download_tiles(src, lat_deg, lon_deg, zoom, radius):
@@ -704,7 +704,7 @@ def download_tiles(src, lat_deg, lon_deg, zoom, radius):
     for tileX in range(tileX_min, tileX_max+1):
         for tileY in range(tileY_min, tileY_max+1):
             if (total_tiles % 10) == 0:
-                print('tileX:%s tileY:%s zoom:%s already-downloaded:%s added:%s'%(tileX, tileY, zoom, ok, total_tiles), flush=True)
+                print('tileX:%s tileY:%s zoom:%s already-downloaded:%s added:%s' % (tileX, tileY, zoom, ok, total_tiles), flush=True)
                 tile_exists =  mbTiles.TileExists(zoom, tileX, tileY)
             if tile_exists != None:
                 raw = mbTiles.GetTile(zoom, tileX, tileY)
@@ -727,18 +727,18 @@ def set_up_target_db(name='sentinel'):
     if not os.path.isdir(work_dir):
         # os.mkdir('./work')
         work_dir = '/tmp'
-        dbpath = '%s/%s'%(work_dir, dbname)
+        dbpath = '%s/%s' % (work_dir, dbname)
         if not os.path.exists(dbpath):
         # if True:
         #    shutil.copyfile('%s/%s'%(sat_dir,sat_mbtile_fname),dbpath)
             pass
-    print('Opening %s'%dbpath)
+    print('Opening %s' % dbpath)
     mbTiles = MBTiles(dbpath)
     mbTiles.CheckSchema()
     mbTiles.get_bounds()
     config['last_db'] = dbpath
     put_config()
-    print("Destination Database opened successfully:%s"%dbpath)
+    print("Destination Database opened successfully:%s" % dbpath)
 
 def record_satellite_info():
     sat_bboxes(args.lat, args.lon, args.zoom, args.radius)
@@ -775,11 +775,11 @@ def do_downloads():
     start = time.time()
     print(args.zoom, args.topzoom)
     for zoom in range(args.zoom, args.topzoom):
-        print("new zoom level:%s"%zoom, flush=True)
+        print("new zoom level:%s" % zoom, flush=True)
         download_tiles(src, args.lat, args.lon, zoom, args.radius)
-    seconds =(time.time()-start)
+    seconds = (time.time() - start)
     d, h, m, s = dhms_from_seconds(seconds)
-    print('Total time:%2.0f hrs:%2.0f min:%2.0f sec Duplicates:%s Total_tiles Added:%s'%(h, m, s, ok, total_tiles))
+    print('Total time:%2.0f hrs:%2.0f min:%2.0f sec Duplicates:%s Total_tiles Added:%s' % (h, m, s, ok, total_tiles))
     record_satellite_info()
 
 def main():
@@ -794,13 +794,13 @@ def main():
     if not os.path.isdir('./work'):
         os.mkdir('./work')
     if not args.mbtiles:
-        args.mbtiles = sat_dir +'/' + sat_mbtile_fname
-    print('mbtiles SOURCE filename:%s'%args.mbtiles)
+        args.mbtiles = sat_dir + '/' + sat_mbtile_fname
+    print('mbtiles SOURCE filename:%s' % args.mbtiles)
     if os.path.isfile(args.mbtiles):
         mbTiles  = MBTiles(args.mbtiles)
         bounds = mbTiles.get_bounds()
     if False:  #else:
-        print('Failed to open %s -- Quitting'%args.mbtiles)
+        print('Failed to open %s -- Quitting' % args.mbtiles)
         sys.exit()
     if args.get != None:
         print('get specified')
@@ -825,7 +825,7 @@ def main():
         args.lat = 37.46
     if args.topzoom != 14:
         args.topzoom = args.topzoom+1
-    print('inputs to tileXY: lat:%s lon:%s zoom:%s'%(args.lat, args.lon, args.zoom))
+    print('inputs to tileXY: lat:%s lon:%s zoom:%s' % (args.lat, args.lon, args.zoom))
     args.x, args.y = xytools.tileXY(args.lat, args.lon, args.zoom)
 
     do_downloads()
