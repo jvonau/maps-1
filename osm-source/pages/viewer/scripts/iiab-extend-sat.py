@@ -55,6 +55,7 @@ sat_dir = '/library/www/osm-vector-maps/viewer/tiles'
 # -------------------------------------------------------
 from math import *
 
+
 class Tools(object):
     def numTiles(self, z):
         return(pow(2, z))
@@ -126,6 +127,7 @@ class Tools(object):
 
     def tileURL(self, x, y, z, layer):
         return "%s%d/%d/%d.%s" % (self.tileLayerBase(layer), z, x, y, self.tileLayerExt(layer))
+
 
 class MBTiles():
     def __init__(self, filename):
@@ -393,6 +395,7 @@ class MBTiles():
                              tiles_downloaded, command_line, magic_number, min_zoom, max_zoom,))
         self.Commit()
 
+
 class WMTS(object):
 
     def __init__(self, template):
@@ -422,6 +425,7 @@ class WMTS(object):
         parser.add_argument("-g", "--get", help='get WMTS tiles from this URL(Default: Sentinel Cloudless).')
         parser.add_argument("-s", "--summarize", help="Data about each zoom level.", action="store_true")
         return parser.parse_args()
+
 
 class Extract(object):
 
@@ -649,6 +653,7 @@ class Extract(object):
             if args.fix:
                 bad_ref.close()
 
+
 def replace_tile(src, zoom, tileX, tileY):
     global total_tiles
     for tries in range(1, 10):
@@ -683,6 +688,7 @@ def replace_tile(src, zoom, tileX, tileY):
             print('get url in replace_tile returned:%s' % r.status)
             return False
 
+
 def download_tiles(src, lat_deg, lon_deg, zoom, radius):
     global mbTiles, ok
     global total_tiles
@@ -710,6 +716,7 @@ def download_tiles(src, lat_deg, lon_deg, zoom, radius):
                 pass
             replace_tile(src, zoom, tileX, tileY)
 
+
 def set_up_target_db(name='sentinel'):
     global mbTiles
     global work_dir
@@ -733,6 +740,7 @@ def set_up_target_db(name='sentinel'):
     put_config()
     print("Destination Database opened successfully:%s" % dbpath)
 
+
 def record_satellite_info():
     sat_bboxes(args.lat, args.lon, args.zoom, args.radius)
     mbTiles.create_sat_info()
@@ -749,6 +757,7 @@ def record_satellite_info():
     mbTiles.insert_sat_info(perma_ref, bounds_string, coordinates, date_downloaded,
                             tiles_downloaded, command_line, magic_number,
                             min_zoom, max_zoom)
+
 
 def do_downloads():
     # Open a WMTS source
@@ -774,6 +783,7 @@ def do_downloads():
     d, h, m, s = dhms_from_seconds(seconds)
     print('Total time:%2.0f hrs:%2.0f min:%2.0f sec Duplicates:%s Total_tiles Added:%s' % (h, m, s, ok, total_tiles))
     record_satellite_info()
+
 
 def main():
     global args
